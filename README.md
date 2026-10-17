@@ -1,4 +1,5 @@
 Industrial Safety & Temperature Alarm System
+<img width="1231" height="587" alt="image" src="https://github.com/user-attachments/assets/c03c5f13-5d3e-4e68-b947-0c61455dc273" />
 
 Overview
 
