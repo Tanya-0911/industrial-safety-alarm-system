@@ -13,7 +13,6 @@ sbit ADC_START = P3^1;
 sbit ADC_EOC   = P3^2;
 sbit ADC_OE    = P3^3;
 
-/* LCD control pins */
 sbit LCD_RS = P2^0;
 sbit LCD_EN = P2^1;
 
@@ -23,13 +22,23 @@ sbit LCD_D5 = P2^5;
 sbit LCD_D6 = P2^6;
 sbit LCD_D7 = P2^7;
 
-/* Safety inputs - ACTIVE LOW */
+/* =========================================================
+   SAFETY INPUTS
+   ACTIVE LOW
+
+   Sensor/switch released = 1
+   Sensor/switch active   = 0
+   ========================================================= */
+
 sbit FLAME     = P1^0;
 sbit GAS       = P1^1;
 sbit VIBRATION = P1^2;
 sbit EMERGENCY = P1^3;
 
-/* Indicators */
+/* =========================================================
+   INDICATORS
+   ========================================================= */
+
 sbit GREEN_LED  = P1^4;
 sbit YELLOW_LED = P1^5;
 sbit RED_LED    = P1^6;
@@ -59,16 +68,18 @@ void delay_ms(unsigned int ms)
    LCD FUNCTIONS
    ========================================================= */
 
+/* Generate LCD Enable pulse */
 void lcd_pulse(void)
 {
     LCD_EN = 1;
     delay_ms(1);
+
     LCD_EN = 0;
     delay_ms(1);
 }
 
 
-/* Send one 4-bit nibble to LCD */
+/* Send one 4-bit nibble */
 void lcd_nibble(unsigned char nibble)
 {
     LCD_D4 = (nibble >> 0) & 1;
@@ -80,7 +91,7 @@ void lcd_nibble(unsigned char nibble)
 }
 
 
-/* Send command */
+/* Send command to LCD */
 void lcd_cmd(unsigned char cmd)
 {
     LCD_RS = 0;
@@ -92,7 +103,7 @@ void lcd_cmd(unsigned char cmd)
 }
 
 
-/* Send character */
+/* Send character to LCD */
 void lcd_data(unsigned char dat)
 {
     LCD_RS = 1;
@@ -104,7 +115,7 @@ void lcd_data(unsigned char dat)
 }
 
 
-/* Send string */
+/* Send string to LCD */
 void lcd_string(char *str)
 {
     while(*str)
@@ -115,10 +126,7 @@ void lcd_string(char *str)
 }
 
 
-/* Set LCD cursor
-   row = 0 or 1
-   col = 0 to 15
-*/
+/* Set LCD cursor position */
 void lcd_goto(unsigned char row, unsigned char col)
 {
     if(row == 0)
@@ -140,7 +148,10 @@ void lcd_clear(void)
 }
 
 
-/* LCD initialization */
+/* =========================================================
+   LCD INITIALIZATION
+   ========================================================= */
+
 void lcd_init(void)
 {
     LCD_RS = 0;
@@ -160,7 +171,7 @@ void lcd_init(void)
 
     lcd_nibble(0x02);
 
-    /* 4-bit, 2-line, 5x8 font */
+    /* 4-bit mode, 2 lines, 5x8 font */
     lcd_cmd(0x28);
 
     /* Display ON, cursor OFF */
@@ -186,7 +197,6 @@ unsigned char adc_read(void)
 
     /*
        Start ADC conversion
-       ALE and START are pulsed HIGH
     */
 
     ADC_ALE = 1;
@@ -198,10 +208,10 @@ unsigned char adc_read(void)
     ADC_START = 0;
 
     /*
-       Wait for conversion to complete.
+       Wait for conversion.
 
-       ADC0808 EOC normally goes LOW while converting
-       and HIGH when conversion is complete.
+       EOC LOW  = conversion in progress
+       EOC HIGH = conversion complete
     */
 
     while(ADC_EOC == 1);
@@ -237,13 +247,12 @@ unsigned int get_temperature(void)
        VREF+ = 5V
        VREF- = 0V
 
-       ADC resolution = 256 levels
+       8-bit ADC = 256 levels
 
        LM35:
-       10 mV / °C
+       10 mV / degree C
 
-       Temperature:
-       ADC value * 500 / 256
+       Temperature = ADC value * 500 / 256
     */
 
     temperature = ((unsigned int)adc_value * 500) / 256;
@@ -253,10 +262,38 @@ unsigned int get_temperature(void)
 
 
 /* =========================================================
+   TEMPERATURE DISPLAY
+   ========================================================= */
+
+void display_temperature(unsigned int temperature)
+{
+    lcd_string("TEMP: ");
+
+    if(temperature >= 100)
+    {
+        lcd_data((temperature / 100) + '0');
+        lcd_data(((temperature / 10) % 10) + '0');
+        lcd_data((temperature % 10) + '0');
+    }
+    else if(temperature >= 10)
+    {
+        lcd_data((temperature / 10) + '0');
+        lcd_data((temperature % 10) + '0');
+    }
+    else
+    {
+        lcd_data(temperature + '0');
+    }
+
+    lcd_string(" C");
+}
+
+
+/* =========================================================
    INDICATOR FUNCTIONS
    ========================================================= */
 
-/* Turn everything OFF */
+/* Turn all indicators OFF */
 void indicators_off(void)
 {
     GREEN_LED  = 0;
@@ -297,286 +334,364 @@ void alarm_condition(void)
 
 
 /* =========================================================
-   MAIN PROGRAM
+   DISPLAY MULTIPLE ACTIVE SENSORS
+   =========================================================
+
+   LCD line 1:
+       MULTI SENSOR
+
+   LCD line 2:
+       FLAME GAS VIB
+
+   Abbreviations:
+       FLAME = FLAME
+       GAS   = GAS
+       VIB   = VIB
+       EMG   = EMG
    ========================================================= */
 
+void display_multiple_sensors(void)
+{
+    lcd_clear();
+
+    lcd_goto(0,0);
+    lcd_string("MULTI SENSOR");
+
+    lcd_goto(1,0);
+
+    if(FLAME == 0)
+    {
+        lcd_string("FLAME ");
+    }
+
+    if(GAS == 0)
+    {
+        lcd_string("GAS ");
+    }
+
+    if(VIBRATION == 0)
+    {
+        lcd_string("VIB ");
+    }
+
+    if(EMERGENCY == 0)
+    {
+        lcd_string("EMG");
+    }
+}
+
+
+/* =========================================================
+   DISPLAY SINGLE FLAME ALERT
+   ========================================================= */
+
+void display_flame_alert(void)
+{
+    lcd_clear();
+
+    lcd_goto(0,0);
+    lcd_string("FLAME ALERT");
+
+    lcd_goto(1,0);
+    lcd_string("FIRE DETECTED");
+}
+
+
+/* =========================================================
+   DISPLAY SINGLE GAS ALERT
+   ========================================================= */
+
+void display_gas_alert(void)
+{
+    lcd_clear();
+
+    lcd_goto(0,0);
+    lcd_string("GAS ALERT");
+
+    lcd_goto(1,0);
+    lcd_string("GAS DETECTED");
+}
+
+
+/* =========================================================
+   DISPLAY SINGLE VIBRATION ALERT
+   ========================================================= */
+
+void display_vibration_alert(void)
+{
+    lcd_clear();
+
+    lcd_goto(0,0);
+    lcd_string("VIBRATION ALERT");
+
+    lcd_goto(1,0);
+    lcd_string("VIBRATION HIGH");
+}
+
+
+/* =========================================================
+   DISPLAY EMERGENCY ALERT
+   ========================================================= */
+
+void display_emergency_alert(void)
+{
+    lcd_clear();
+
+    lcd_goto(0,0);
+    lcd_string("EMERGENCY");
+
+    lcd_goto(1,0);
+    lcd_string("SWITCH ACTIVE");
+}
+
+
+/* =========================================================
+   DISPLAY CRITICAL TEMPERATURE
+   ========================================================= */
+
+void display_critical_temperature(unsigned int temperature)
+{
+    lcd_clear();
+
+    lcd_goto(0,0);
+    lcd_string("TEMP CRITICAL");
+
+    lcd_goto(1,0);
+
+    display_temperature(temperature);
+}
+
+
+/* =========================================================
+   ADDED: SAFETY INDEX AND ALARM CLASSIFICATION
+   ========================================================= */
+#define STATE_SAFE     0
+#define STATE_PREWARN  1
+#define STATE_WARNING  2
+#define STATE_DANGER   3
+#define STATE_EMERGENCY 4
+
+volatile unsigned char screen_change = 0;
+volatile unsigned char screen_number = 0;
+volatile unsigned int timer_ticks = 0;
+
+/* 11.0592 MHz, 12 clock cycles per timer tick.
+   Mode 1 preload DC00h gives nominal 10 ms. */
+void timer0_init(void)
+{
+    TMOD = (TMOD & 0xF0) | 0x01;
+    TH0 = 0xDC;
+    TL0 = 0x00;
+    ET0 = 1;
+    EA = 1;
+    TR0 = 1;
+}
+
+void timer0_isr(void) interrupt 1
+{
+    TH0 = 0xDC;
+    TL0 = 0x00;
+    timer_ticks++;
+    if (timer_ticks >= 200)
+    {
+        timer_ticks = 0;
+        screen_change = 1;
+    }
+}
+
+unsigned char calculate_index(unsigned int temperature,
+                              unsigned char flame,
+                              unsigned char gas,
+                              unsigned char vibration,
+                              unsigned char emergency)
+{
+    unsigned int risk = 0;
+    if (emergency) return 0;
+    if (temperature >= 50) risk += 30;
+    else if (temperature >= 40) risk += 20;
+    else if (temperature >= 30) risk += 10;
+    if (flame) risk += 30;
+    if (gas) risk += 25;
+    if (vibration) risk += 15;
+    if (risk >= 100) return 0;
+    return (unsigned char)(100 - risk);
+}
+
+unsigned char classify_alarm(unsigned int temperature,
+                             unsigned char flame,
+                             unsigned char gas,
+                             unsigned char vibration,
+                             unsigned char emergency)
+{
+    if (emergency) return STATE_EMERGENCY;
+    if (temperature >= 50 || flame || gas) return STATE_DANGER;
+    if (temperature >= 40 || vibration) return STATE_WARNING;
+    if (temperature >= 30) return STATE_PREWARN;
+    return STATE_SAFE;
+}
+
+void lcd_number3(unsigned char number)
+{
+    lcd_data((number / 100) + '0');
+    lcd_data(((number / 10) % 10) + '0');
+    lcd_data((number % 10) + '0');
+}
+
+void display_index_status(unsigned char index, unsigned char state)
+{
+    lcd_clear();
+    lcd_goto(0, 0);
+    lcd_string("SAFETY IDX: ");
+    lcd_number3(index);
+    lcd_goto(1, 0);
+    if (state == STATE_EMERGENCY) lcd_string("EMERGENCY");
+    else if (state == STATE_DANGER) lcd_string("STATUS: DANGER");
+    else if (state == STATE_WARNING) lcd_string("STATUS: WARNING");
+    else if (state == STATE_PREWARN) lcd_string("STATUS: PREWARN");
+    else lcd_string("STATUS: SAFE");
+}
+
+/* Keep the original hazard display functions and priority messages. */
+void display_sensor_details(unsigned int temperature,
+                            unsigned char alarm_count)
+{
+    if (EMERGENCY == 0) display_emergency_alert();
+    else if (temperature >= 50) display_critical_temperature(temperature);
+    else if (alarm_count >= 2) display_multiple_sensors();
+    else if (FLAME == 0) display_flame_alert();
+    else if (GAS == 0) display_gas_alert();
+    else if (VIBRATION == 0) display_vibration_alert();
+    else if (temperature >= 40)
+    {
+        lcd_clear();
+        lcd_goto(0, 0);
+        lcd_string("TEMP WARNING");
+        lcd_goto(1, 0);
+        display_temperature(temperature);
+    }
+    else if (temperature >= 30)
+    {
+        lcd_clear();
+        lcd_goto(0, 0);
+        lcd_string("TEMP PRE-WARN");
+        lcd_goto(1, 0);
+        display_temperature(temperature);
+    }
+    else
+    {
+        lcd_clear();
+        lcd_goto(0, 0);
+        lcd_string("SYSTEM NORMAL");
+        lcd_goto(1, 0);
+        display_temperature(temperature);
+    }
+}
+
+/* =========================================================
+   MAIN PROGRAM (existing pin assignments and LCD/ADC retained)
+   ========================================================= */
 void main(void)
 {
     unsigned int temperature;
     unsigned char alarm_count;
+    unsigned char flame_active, gas_active, vibration_active;
+    unsigned char emergency_active, safety_index, alarm_state;
+    unsigned char previous_state = 255;
+    unsigned char previous_screen = 255;
+    unsigned char previous_index = 255;
+    unsigned int previous_temperature = 65535;
+    unsigned char previous_count = 255;
+    unsigned char previous_flags = 255;
+    unsigned char flags;
+    unsigned char refresh;
 
-    /* Initial port states */
+    /* Original initial port states */
     P0 = 0xFF;
     P1 = 0x0F;
     P2 = 0x00;
     P3 = 0xFF;
 
-    /* Initialize LCD */
     lcd_init();
-
-    /* Initial display */
     lcd_clear();
-
-    lcd_goto(0, 0);
+    lcd_goto(0,0);
     lcd_string("INDUSTRIAL SAFE");
-
-    lcd_goto(1, 0);
+    lcd_goto(1,0);
     lcd_string("SYSTEM STARTING");
-
     delay_ms(2000);
-
     lcd_clear();
+    timer0_init();
 
-
-    /* =====================================================
-       MAIN LOOP
-       ===================================================== */
-
-    while(1)
+    while (1)
     {
-        /*
-           Read temperature
-        */
         temperature = get_temperature();
+        flame_active = (FLAME == 0);
+        gas_active = (GAS == 0);
+        vibration_active = (VIBRATION == 0);
+        emergency_active = (EMERGENCY == 0);
 
+        alarm_count = flame_active + gas_active +
+                      vibration_active + emergency_active;
+        flags = flame_active | (gas_active << 1) |
+                (vibration_active << 2) | (emergency_active << 3);
 
-        /*
-           Count active safety inputs.
+        safety_index = calculate_index(temperature, flame_active,
+                         gas_active, vibration_active, emergency_active);
+        alarm_state = classify_alarm(temperature, flame_active,
+                         gas_active, vibration_active, emergency_active);
 
-           IMPORTANT:
-           Your current Proteus switches are ACTIVE LOW.
-
-           Switch released = 1
-           Switch pressed  = 0
-        */
-
-        alarm_count = 0;
-
-        if(FLAME == 0)
-        {
-            alarm_count++;
-        }
-
-        if(GAS == 0)
-        {
-            alarm_count++;
-        }
-
-        if(VIBRATION == 0)
-        {
-            alarm_count++;
-        }
-
-        if(EMERGENCY == 0)
-        {
-            alarm_count++;
-        }
-
-
-        /* =================================================
-           PRIORITY 1:
-           HIGH ALERT
-
-           HIGH ALERT occurs when:
-
-           1. Temperature >= 50°C
-              OR
-           2. Two or more safety sensors are active
-
-           This has the highest priority.
-           ================================================= */
-
-        if((temperature >= 50) || (alarm_count >= 2))
-        {
+        /* Original indicator functions; pre-warning uses warning LEDs. */
+        if (alarm_state == STATE_DANGER || alarm_state == STATE_EMERGENCY)
             alarm_condition();
-
-            lcd_clear();
-
-            lcd_goto(0, 0);
-            lcd_string("HIGH ALERT");
-
-            lcd_goto(1, 0);
-
-            if(temperature >= 50)
-            {
-                lcd_string("TEMP CRITICAL");
-            }
-            else
-            {
-                lcd_string("MULTI SENSOR");
-            }
-        }
-
-
-        /* =================================================
-           PRIORITY 2:
-           SINGLE FLAME ALERT
-           ================================================= */
-
-        else if(FLAME == 0)
-        {
-            alarm_condition();
-
-            lcd_clear();
-
-            lcd_goto(0, 0);
-            lcd_string("ALERT: FLAME!");
-
-            lcd_goto(1, 0);
-            lcd_string("FIRE DETECTED");
-        }
-
-
-        /* =================================================
-           PRIORITY 3:
-           SINGLE GAS ALERT
-           ================================================= */
-
-        else if(GAS == 0)
-        {
-            alarm_condition();
-
-            lcd_clear();
-
-            lcd_goto(0, 0);
-            lcd_string("ALERT: GAS!");
-
-            lcd_goto(1, 0);
-            lcd_string("GAS DETECTED");
-        }
-
-
-        /* =================================================
-           PRIORITY 4:
-           SINGLE VIBRATION ALERT
-           ================================================= */
-
-        else if(VIBRATION == 0)
-        {
-            alarm_condition();
-
-            lcd_clear();
-
-            lcd_goto(0, 0);
-            lcd_string("ALERT: VIBRATION");
-
-            lcd_goto(1, 0);
-            lcd_string("VIBRATION HIGH");
-        }
-
-
-        /* =================================================
-           PRIORITY 5:
-           SINGLE EMERGENCY ALERT
-           ================================================= */
-
-        else if(EMERGENCY == 0)
-        {
-            GREEN_LED = 1;
-            YELLOW_LED = 0;
-            RED_LED = 1;
-            BUZZER = 1;
-
-            lcd_clear();
-
-            lcd_goto(0, 0);
-            lcd_string("EMERGENCY");
-
-            lcd_goto(1, 0);
-            lcd_string("SWITCH ACTIVE");
-        }
-
-
-        /* =================================================
-           PRIORITY 6:
-           HIGH TEMPERATURE
-
-           This case is technically covered by HIGH ALERT
-           above when temperature >= 50°C.
-           ================================================= */
-
-        else if(temperature >= 50)
-        {
-            alarm_condition();
-
-            lcd_clear();
-
-            lcd_goto(0, 0);
-            lcd_string("HIGH TEMPERATURE");
-
-            lcd_goto(1, 0);
-            lcd_string("TEMP >= 50C");
-        }
-
-
-        /* =================================================
-           PRIORITY 7:
-           WARNING TEMPERATURE
-
-           30°C to 49°C
-           ================================================= */
-
-        else if(temperature >= 30)
-        {
+        else if (alarm_state == STATE_WARNING || alarm_state == STATE_PREWARN)
             warning_condition();
-
-            lcd_clear();
-
-            lcd_goto(0, 0);
-            lcd_string("TEMP WARNING");
-
-            lcd_goto(1, 0);
-            lcd_string("TEMP: ");
-
-            /* Display approximate temperature */
-            lcd_data((temperature / 10) + '0');
-            lcd_data((temperature % 10) + '0');
-            lcd_string(" C");
-        }
-
-
-        /* =================================================
-           PRIORITY 8:
-           NORMAL CONDITION
-
-           Temperature below 30°C
-           and no safety sensor active.
-           ================================================= */
-
         else
-        {
             normal_condition();
 
-            lcd_clear();
-
-            lcd_goto(0, 0);
-            lcd_string("SYSTEM NORMAL");
-
-            lcd_goto(1, 0);
-            lcd_string("TEMP: ");
-
-            /* Display temperature */
-            if(temperature >= 100)
-            {
-                lcd_data((temperature / 100) + '0');
-                lcd_data(((temperature / 10) % 10) + '0');
-                lcd_data((temperature % 10) + '0');
-            }
-            else if(temperature >= 10)
-            {
-                lcd_data((temperature / 10) + '0');
-                lcd_data((temperature % 10) + '0');
-            }
-            else
-            {
-                lcd_data(temperature + '0');
-            }
-
-            lcd_string(" C");
+        /* Timer interrupt only requests a screen change. */
+        refresh = 0;
+        if (screen_change)
+        {
+            EA = 0;
+            screen_change = 0;
+            EA = 1;
+            screen_number = !screen_number;
+            refresh = 1;
         }
 
+        /* A newly detected danger overrides the normal screen rotation. */
+        if ((alarm_state >= STATE_DANGER) &&
+            ((previous_state < STATE_DANGER) || (flags != previous_flags)))
+        {
+            screen_number = 1;
+            refresh = 1;
+            EA = 0;
+            timer_ticks = 0;
+            screen_change = 0;
+            EA = 1;
+        }
 
-        /* Small delay before next reading */
-        delay_ms(300);
+        if (screen_number != previous_screen ||
+            alarm_state != previous_state ||
+            safety_index != previous_index ||
+            (screen_number == 1 &&
+             (temperature != previous_temperature ||
+              alarm_count != previous_count || flags != previous_flags)))
+            refresh = 1;
+
+        if (refresh)
+        {
+            if (screen_number == 0)
+                display_index_status(safety_index, alarm_state);
+            else
+                display_sensor_details(temperature, alarm_count);
+        }
+
+        previous_screen = screen_number;
+        previous_state = alarm_state;
+        previous_index = safety_index;
+        previous_temperature = temperature;
+        previous_count = alarm_count;
+        previous_flags = flags;
+        /* No 800 ms blocking delay: sensors are polled repeatedly. */
     }
 }
