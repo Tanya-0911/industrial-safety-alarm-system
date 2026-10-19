@@ -52,6 +52,8 @@ The pin assignments below are taken from the firmware and should match the Prote
 | Green / Yellow / Red LEDs / Buzzer | P1.4 / P1.5 / P1.6 / P1.7 |
 
 **Input logic:** the four digital safety inputs are **active low** (`0` = detected/pressed, `1` = inactive). Output polarity follows the existing circuit and firmware; check your Proteus LED and buzzer wiring.
+<img width="1231" height="587" alt="image" src="https://github.com/user-attachments/assets/c03c5f13-5d3e-4e68-b947-0c61455dc273" />
+
 
 ## Safety Index calculation
 
