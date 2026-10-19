@@ -1,4 +1,4 @@
-BL51 BANKED LINKER/LOCATER V6.22.4.0                                                    09/14/2026  17:55:21  PAGE 1
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                    10/19/2026  17:47:33  PAGE 1
 
 
 BL51 BANKED LINKER/LOCATER V6.22.4.0, INVOKED BY:
@@ -15,6 +15,7 @@ INPUT MODULES INCLUDED:
   C:\USERS\SINHA\DESKTOP\C51\LIB\C51S.LIB (?C?CLDPTR)
   C:\USERS\SINHA\DESKTOP\C51\LIB\C51S.LIB (?C?IMUL)
   C:\USERS\SINHA\DESKTOP\C51\LIB\C51S.LIB (?C?UIDIV)
+  C:\USERS\SINHA\DESKTOP\C51\LIB\C51S.LIB (?C_INIT)
 
 
 LINK MAP OF MODULE:  .\Objects\industrial (ALARM_SYSTEM)
@@ -25,515 +26,797 @@ LINK MAP OF MODULE:  .\Objects\industrial (ALARM_SYSTEM)
 
             * * * * * * *   D A T A   M E M O R Y   * * * * * * *
             REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
-            DATA    0008H     0005H     UNIT         _DATA_GROUP_
-            IDATA   000DH     0001H     UNIT         ?STACK
+            DATA    0008H     0018H     UNIT         _DATA_GROUP_
+            DATA    0020H     0004H     UNIT         ?DT?ALARM_SYSTEM
+            IDATA   0024H     0001H     UNIT         ?STACK
 
             * * * * * * *   C O D E   M E M O R Y   * * * * * * *
             CODE    0000H     0003H     ABSOLUTE     
-                    0003H     07FDH                  *** GAP ***
-            CODE    0800H     01DFH     INBLOCK      ?PR?MAIN?ALARM_SYSTEM
-            CODE    09DFH     00F5H     UNIT         ?CO?ALARM_SYSTEM
-            CODE    0AD4H     0080H     UNIT         ?C?LIB_CODE
-            CODE    0B54H     0033H     INBLOCK      ?PR?LCD_INIT?ALARM_SYSTEM
-            CODE    0B87H     0028H     INBLOCK      ?PR?_DELAY_MS?ALARM_SYSTEM
-            CODE    0BAFH     0028H     INBLOCK      ?PR?_LCD_NIBBLE?ALARM_SYSTEM
-            CODE    0BD7H     0021H     INBLOCK      ?PR?_LCD_STRING?ALARM_SYSTEM
-            CODE    0BF8H     001BH     INBLOCK      ?PR?_LCD_DATA?ALARM_SYSTEM
-            CODE    0C13H     001AH     INBLOCK      ?PR?_LCD_GOTO?ALARM_SYSTEM
-            CODE    0C2DH     0019H     INBLOCK      ?PR?ADC_READ?ALARM_SYSTEM
-            CODE    0C46H     000FH     INBLOCK      ?PR?GET_TEMPERATURE?ALARM_SYSTEM
-            CODE    0C55H     000DH     INBLOCK      ?PR?_LCD_CMD?ALARM_SYSTEM
-            CODE    0C62H     000CH     UNIT         ?C_C51STARTUP
-            CODE    0C6EH     000AH     INBLOCK      ?PR?LCD_CLEAR?ALARM_SYSTEM
-            CODE    0C78H     0009H     INBLOCK      ?PR?INDICATORS_OFF?ALARM_SYSTEM
-            CODE    0C81H     0009H     INBLOCK      ?PR?NORMAL_CONDITION?ALARM_SYSTEM
-            CODE    0C8AH     0009H     INBLOCK      ?PR?WARNING_CONDITION?ALARM_SYSTEM
-            CODE    0C93H     0009H     INBLOCK      ?PR?ALARM_CONDITION?ALARM_SYSTEM
-            CODE    0C9CH     0008H     INBLOCK      ?PR?LCD_PULSE?ALARM_SYSTEM
+                    0003H     0008H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+                    000EH     07F2H                  *** GAP ***
+            CODE    0800H     0177H     UNIT         ?PR?MAIN?ALARM_SYSTEM
+            CODE    0977H     0134H     UNIT         ?CO?ALARM_SYSTEM
+            CODE    0AABH     008CH     UNIT         ?C_C51STARTUP
+            CODE    0B37H     0081H     UNIT         ?PR?_DISPLAY_SENSOR_DETAILS?ALARM_SYSTEM
+            CODE    0BB8H     0080H     UNIT         ?C?LIB_CODE
+            CODE    0C38H     0079H     UNIT         ?PR?_CALCULATE_INDEX?ALARM_SYSTEM
+            CODE    0CB1H     0073H     UNIT         ?PR?_DISPLAY_TEMPERATURE?ALARM_SYSTEM
+            CODE    0D24H     0058H     UNIT         ?PR?_DISPLAY_INDEX_STATUS?ALARM_SYSTEM
+            CODE    0D7CH     0044H     UNIT         ?PR?DISPLAY_MULTIPLE_SENSORS?ALARM_SYSTEM
+            CODE    0DC0H     003CH     UNIT         ?PR?LCD_INIT?ALARM_SYSTEM
+            CODE    0DFCH     0038H     UNIT         ?PR?_CLASSIFY_ALARM?ALARM_SYSTEM
+            CODE    0E34H     002EH     UNIT         ?PR?_LCD_NUMBER3?ALARM_SYSTEM
+            CODE    0E62H     002BH     UNIT         ?PR?TIMER0_ISR?ALARM_SYSTEM
+            CODE    0E8DH     002AH     UNIT         ?PR?_LCD_NIBBLE?ALARM_SYSTEM
+            CODE    0EB7H     0029H     UNIT         ?PR?_DELAY_MS?ALARM_SYSTEM
+            CODE    0EE0H     0023H     UNIT         ?PR?_LCD_STRING?ALARM_SYSTEM
+            CODE    0F03H     001EH     UNIT         ?PR?_DISPLAY_CRITICAL_TEMPERATURE?ALARM_SYSTEM
+            CODE    0F21H     001CH     UNIT         ?PR?DISPLAY_FLAME_ALERT?ALARM_SYSTEM
+            CODE    0F3DH     001CH     UNIT         ?PR?DISPLAY_GAS_ALERT?ALARM_SYSTEM
+            CODE    0F59H     001CH     UNIT         ?PR?DISPLAY_VIBRATION_ALERT?ALARM_SYSTEM
+            CODE    0F75H     001CH     UNIT         ?PR?DISPLAY_EMERGENCY_ALERT?ALARM_SYSTEM
+            CODE    0F91H     001BH     UNIT         ?PR?_LCD_DATA?ALARM_SYSTEM
+            CODE    0FACH     001BH     UNIT         ?PR?ADC_READ?ALARM_SYSTEM
+            CODE    0FC7H     001AH     UNIT         ?PR?_LCD_GOTO?ALARM_SYSTEM
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 2
+
+
+            CODE    0FE1H     0015H     UNIT         ?PR?TIMER0_INIT?ALARM_SYSTEM
+            CODE    0FF6H     0011H     UNIT         ?PR?GET_TEMPERATURE?ALARM_SYSTEM
+            CODE    1007H     000EH     UNIT         ?PR?_LCD_CMD?ALARM_SYSTEM
+            CODE    1015H     000CH     UNIT         ?PR?LCD_CLEAR?ALARM_SYSTEM
+            CODE    1021H     000BH     UNIT         ?C_INITSEG
+            CODE    102CH     000AH     UNIT         ?PR?LCD_PULSE?ALARM_SYSTEM
+            CODE    1036H     0009H     UNIT         ?PR?INDICATORS_OFF?ALARM_SYSTEM
+            CODE    103FH     0009H     UNIT         ?PR?NORMAL_CONDITION?ALARM_SYSTEM
+            CODE    1048H     0009H     UNIT         ?PR?WARNING_CONDITION?ALARM_SYSTEM
+            CODE    1051H     0009H     UNIT         ?PR?ALARM_CONDITION?ALARM_SYSTEM
 
 
 
 OVERLAY MAP OF MODULE:   .\Objects\industrial (ALARM_SYSTEM)
 
 
-SEGMENT                                      DATA_GROUP 
-  +--> CALLED SEGMENT                      START    LENGTH
-----------------------------------------------------------
-BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  09/14/2026  17:55:21  PAGE 2
-
-
-?C_C51STARTUP                              -----    -----
+SEGMENT                                            DATA_GROUP 
+  +--> CALLED SEGMENT                            START    LENGTH
+----------------------------------------------------------------
+?C_C51STARTUP                                    -----    -----
   +--> ?PR?MAIN?ALARM_SYSTEM
+  +--> ?C_INITSEG
 
-?PR?MAIN?ALARM_SYSTEM                      0008H    0002H
+?PR?MAIN?ALARM_SYSTEM                            0008H    000EH
   +--> ?PR?LCD_INIT?ALARM_SYSTEM
   +--> ?PR?_LCD_GOTO?ALARM_SYSTEM
   +--> ?CO?ALARM_SYSTEM
   +--> ?PR?_LCD_STRING?ALARM_SYSTEM
   +--> ?PR?_DELAY_MS?ALARM_SYSTEM
   +--> ?PR?LCD_CLEAR?ALARM_SYSTEM
+  +--> ?PR?TIMER0_INIT?ALARM_SYSTEM
   +--> ?PR?GET_TEMPERATURE?ALARM_SYSTEM
+  +--> ?PR?_CALCULATE_INDEX?ALARM_SYSTEM
+  +--> ?PR?_CLASSIFY_ALARM?ALARM_SYSTEM
+  +--> ?PR?ALARM_CONDITION?ALARM_SYSTEM
   +--> ?PR?WARNING_CONDITION?ALARM_SYSTEM
-  +--> ?PR?_LCD_DATA?ALARM_SYSTEM
   +--> ?PR?NORMAL_CONDITION?ALARM_SYSTEM
+  +--> ?PR?_DISPLAY_INDEX_STATUS?ALARM_SYSTEM
+  +--> ?PR?_DISPLAY_SENSOR_DETAILS?ALARM_SYSTEM
 
-?PR?LCD_INIT?ALARM_SYSTEM                  -----    -----
+?PR?LCD_INIT?ALARM_SYSTEM                        -----    -----
   +--> ?PR?_DELAY_MS?ALARM_SYSTEM
   +--> ?PR?_LCD_NIBBLE?ALARM_SYSTEM
   +--> ?PR?_LCD_CMD?ALARM_SYSTEM
 
-?PR?_DELAY_MS?ALARM_SYSTEM                 -----    -----
+?PR?_DELAY_MS?ALARM_SYSTEM                       -----    -----
   +--> ?PR?_LCD_NIBBLE?ALARM_SYSTEM
 
-?PR?_LCD_NIBBLE?ALARM_SYSTEM               -----    -----
+?PR?_LCD_NIBBLE?ALARM_SYSTEM                     -----    -----
   +--> ?PR?LCD_PULSE?ALARM_SYSTEM
 
-?PR?_LCD_CMD?ALARM_SYSTEM                  -----    -----
+?PR?_LCD_CMD?ALARM_SYSTEM                        -----    -----
   +--> ?PR?_LCD_NIBBLE?ALARM_SYSTEM
   +--> ?PR?_DELAY_MS?ALARM_SYSTEM
 
-?PR?_LCD_GOTO?ALARM_SYSTEM                 000AH    0001H
-  +--> ?PR?ALARM_CONDITION?ALARM_SYSTEM
+?PR?_LCD_GOTO?ALARM_SYSTEM                       001BH    0001H
   +--> ?PR?LCD_CLEAR?ALARM_SYSTEM
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 3
+
+
   +--> ?PR?_LCD_CMD?ALARM_SYSTEM
 
-?PR?LCD_CLEAR?ALARM_SYSTEM                 -----    -----
+?PR?LCD_CLEAR?ALARM_SYSTEM                       -----    -----
   +--> ?PR?_LCD_CMD?ALARM_SYSTEM
   +--> ?PR?_DELAY_MS?ALARM_SYSTEM
 
-?PR?_LCD_STRING?ALARM_SYSTEM               000AH    0003H
+?PR?_LCD_STRING?ALARM_SYSTEM                     001DH    0003H
   +--> ?PR?_LCD_DATA?ALARM_SYSTEM
 
-?PR?_LCD_DATA?ALARM_SYSTEM                 -----    -----
+?PR?_LCD_DATA?ALARM_SYSTEM                       -----    -----
   +--> ?PR?_LCD_NIBBLE?ALARM_SYSTEM
   +--> ?PR?_DELAY_MS?ALARM_SYSTEM
 
-?PR?GET_TEMPERATURE?ALARM_SYSTEM           -----    -----
+?PR?GET_TEMPERATURE?ALARM_SYSTEM                 -----    -----
   +--> ?PR?ADC_READ?ALARM_SYSTEM
 
-?PR?ADC_READ?ALARM_SYSTEM                  -----    -----
+?PR?ADC_READ?ALARM_SYSTEM                        -----    -----
   +--> ?PR?_DELAY_MS?ALARM_SYSTEM
+
+?PR?_CALCULATE_INDEX?ALARM_SYSTEM                0016H    0006H
+
+?PR?_CLASSIFY_ALARM?ALARM_SYSTEM                 0016H    0006H
+
+?PR?_DISPLAY_INDEX_STATUS?ALARM_SYSTEM           0016H    0002H
+  +--> ?PR?_LCD_GOTO?ALARM_SYSTEM
+  +--> ?CO?ALARM_SYSTEM
+  +--> ?PR?_LCD_STRING?ALARM_SYSTEM
+  +--> ?PR?_LCD_NUMBER3?ALARM_SYSTEM
+
+?PR?_LCD_NUMBER3?ALARM_SYSTEM                    0018H    0001H
+  +--> ?PR?_LCD_DATA?ALARM_SYSTEM
+
+?PR?_DISPLAY_SENSOR_DETAILS?ALARM_SYSTEM         0016H    0003H
+  +--> ?PR?DISPLAY_EMERGENCY_ALERT?ALARM_SYSTEM
+  +--> ?PR?_DISPLAY_CRITICAL_TEMPERATURE?ALA...
+  +--> ?PR?DISPLAY_MULTIPLE_SENSORS?ALARM_SY...
+  +--> ?PR?DISPLAY_FLAME_ALERT?ALARM_SYSTEM
+  +--> ?PR?DISPLAY_GAS_ALERT?ALARM_SYSTEM
+  +--> ?PR?DISPLAY_VIBRATION_ALERT?ALARM_SYSTEM
+  +--> ?PR?_LCD_GOTO?ALARM_SYSTEM
+  +--> ?CO?ALARM_SYSTEM
+  +--> ?PR?_LCD_STRING?ALARM_SYSTEM
+  +--> ?PR?_DISPLAY_TEMPERATURE?ALARM_SYSTEM
+
+?PR?DISPLAY_EMERGENCY_ALERT?ALARM_SYSTEM         -----    -----
+  +--> ?PR?_LCD_GOTO?ALARM_SYSTEM
+  +--> ?CO?ALARM_SYSTEM
+  +--> ?PR?_LCD_STRING?ALARM_SYSTEM
+
+?PR?_DISPLAY_CRITICAL_TEMPERATURE?ALA...         0019H    0002H
+  +--> ?PR?_LCD_GOTO?ALARM_SYSTEM
+  +--> ?CO?ALARM_SYSTEM
+  +--> ?PR?_LCD_STRING?ALARM_SYSTEM
+  +--> ?PR?_DISPLAY_TEMPERATURE?ALARM_SYSTEM
+
+?PR?_DISPLAY_TEMPERATURE?ALARM_SYSTEM            001BH    0002H
+  +--> ?CO?ALARM_SYSTEM
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 4
+
+
+  +--> ?PR?_LCD_STRING?ALARM_SYSTEM
+  +--> ?PR?_LCD_DATA?ALARM_SYSTEM
+
+?PR?DISPLAY_MULTIPLE_SENSORS?ALARM_SY...         -----    -----
+  +--> ?PR?_LCD_GOTO?ALARM_SYSTEM
+  +--> ?CO?ALARM_SYSTEM
+  +--> ?PR?_LCD_STRING?ALARM_SYSTEM
+
+?PR?DISPLAY_FLAME_ALERT?ALARM_SYSTEM             -----    -----
+  +--> ?PR?_LCD_GOTO?ALARM_SYSTEM
+  +--> ?CO?ALARM_SYSTEM
+  +--> ?PR?_LCD_STRING?ALARM_SYSTEM
+
+?PR?DISPLAY_GAS_ALERT?ALARM_SYSTEM               -----    -----
+  +--> ?PR?_LCD_GOTO?ALARM_SYSTEM
+  +--> ?CO?ALARM_SYSTEM
+  +--> ?PR?_LCD_STRING?ALARM_SYSTEM
+
+?PR?DISPLAY_VIBRATION_ALERT?ALARM_SYSTEM         -----    -----
+  +--> ?PR?_LCD_GOTO?ALARM_SYSTEM
+  +--> ?CO?ALARM_SYSTEM
+  +--> ?PR?_LCD_STRING?ALARM_SYSTEM
 
 
 
 SYMBOL TABLE OF MODULE:  .\Objects\industrial (ALARM_SYSTEM)
 
   VALUE           TYPE          NAME
-BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  09/14/2026  17:55:21  PAGE 3
-
-
   ----------------------------------
 
   -------         MODULE        ALARM_SYSTEM
   C:0000H         SYMBOL        _ICE_DUMMY_
+  C:0D24H         PUBLIC        _display_index_status
   D:0080H         PUBLIC        P0
   B:00B0H.2       PUBLIC        ADC_EOC
   D:0090H         PUBLIC        P1
   D:00A0H         PUBLIC        P2
   D:00B0H         PUBLIC        P3
-  C:0BBAH         PUBLIC        _lcd_nibble
+  C:0E62H         PUBLIC        timer0_isr
+  C:0E99H         PUBLIC        _lcd_nibble
+  B:00A8H.7       PUBLIC        EA
   D:00A8H         PUBLIC        IE
+  C:0CB1H         PUBLIC        _display_temperature
   B:0090H.6       PUBLIC        RED_LED
+  C:0F3DH         PUBLIC        display_gas_alert
   B:0090H.5       PUBLIC        YELLOW_LED
   D:00B8H         PUBLIC        IP
-  C:0C6EH         PUBLIC        lcd_clear
+  C:0F75H         PUBLIC        display_emergency_alert
+  C:1015H         PUBLIC        lcd_clear
   B:0090H.3       PUBLIC        EMERGENCY
+  D:0020H         PUBLIC        timer_ticks
   C:0800H         PUBLIC        main
-  C:0C2DH         PUBLIC        adc_read
-  C:0C8AH         PUBLIC        warning_condition
+  C:0FACH         PUBLIC        adc_read
+  C:1048H         PUBLIC        warning_condition
   B:0090H.4       PUBLIC        GREEN_LED
+  C:0F59H         PUBLIC        display_vibration_alert
   B:00A0H.4       PUBLIC        LCD_D4
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 5
+
+
   B:00A0H.5       PUBLIC        LCD_D5
   B:00A0H.6       PUBLIC        LCD_D6
   B:00A0H.7       PUBLIC        LCD_D7
-  C:0BD7H         PUBLIC        _lcd_string
-  C:0C06H         PUBLIC        _lcd_data
+  C:0C38H         PUBLIC        _calculate_index
+  C:0EE0H         PUBLIC        _lcd_string
+  C:0F9EH         PUBLIC        _lcd_data
   B:0090H.2       PUBLIC        VIBRATION
   D:0098H         PUBLIC        SCON
+  D:0089H         PUBLIC        TMOD
   D:0088H         PUBLIC        TCON
   B:00B0H.1       PUBLIC        ADC_START
-  C:0C81H         PUBLIC        normal_condition
+  C:103FH         PUBLIC        normal_condition
   B:00B0H.3       PUBLIC        ADC_OE
-  C:0C93H         PUBLIC        alarm_condition
-  C:0C9CH         PUBLIC        lcd_pulse
+  C:1051H         PUBLIC        alarm_condition
+  C:0D7CH         PUBLIC        display_multiple_sensors
+  C:102CH         PUBLIC        lcd_pulse
+  C:0F03H         PUBLIC        _display_critical_temperature
+  C:0B37H         PUBLIC        _display_sensor_details
   B:00A0H.1       PUBLIC        LCD_EN
-  C:0C55H         PUBLIC        _lcd_cmd
-  C:0B54H         PUBLIC        lcd_init
-  C:0C1AH         PUBLIC        _lcd_goto
-  C:0B8FH         PUBLIC        _delay_ms
-  C:0C78H         PUBLIC        indicators_off
-  C:0C46H         PUBLIC        get_temperature
+  B:00A8H.1       PUBLIC        ET0
+  C:1007H         PUBLIC        _lcd_cmd
+  C:0DC0H         PUBLIC        lcd_init
+  D:008CH         PUBLIC        TH0
+  D:0022H         PUBLIC        screen_change
+  C:0FCDH         PUBLIC        _lcd_goto
+  D:008AH         PUBLIC        TL0
+  C:0EC0H         PUBLIC        _delay_ms
+  C:0DFCH         PUBLIC        _classify_alarm
+  C:1036H         PUBLIC        indicators_off
+  C:0E34H         PUBLIC        _lcd_number3
+  B:0088H.4       PUBLIC        TR0
+  C:0FF6H         PUBLIC        get_temperature
   B:00A0H.0       PUBLIC        LCD_RS
   B:0090H.1       PUBLIC        GAS
+  C:0F21H         PUBLIC        display_flame_alert
   B:0090H.7       PUBLIC        BUZZER
   B:0090H.0       PUBLIC        FLAME
   D:00C8H         PUBLIC        T2CON
+  C:0FE1H         PUBLIC        timer0_init
+  D:0023H         PUBLIC        screen_number
   D:00D0H         PUBLIC        PSW
   B:00B0H.0       PUBLIC        ADC_ALE
-  C:0B8BH         SYMBOL        L?0070
-  -------         PROC          L?0069
-  -------         ENDPROC       L?0069
-  C:0B8BH         SYMBOL        L?0070
+  C:0EBCH         SYMBOL        L?0140
+  -------         PROC          L?0139
+  -------         ENDPROC       L?0139
+  C:0EBCH         SYMBOL        L?0140
   -------         PROC          _DELAY_MS
   D:0006H         SYMBOL        ms
   -------         DO            
   D:0004H         SYMBOL        i
   D:0002H         SYMBOL        j
-BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  09/14/2026  17:55:21  PAGE 4
-
-
   -------         ENDDO         
-  C:0B8FH         LINE#         44
-  C:0B8FH         LINE#         45
-  C:0B8FH         LINE#         48
-  C:0B99H         LINE#         49
-  C:0B99H         LINE#         50
-  C:0B9CH         LINE#         51
-  C:0B9CH         LINE#         53
-  C:0BA7H         LINE#         54
-  C:0BAEH         LINE#         55
+  C:0EC0H         LINE#         53
+  C:0EC0H         LINE#         54
+  C:0EC0H         LINE#         57
+  C:0ECAH         LINE#         58
+  C:0ECAH         LINE#         59
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 6
+
+
+  C:0ECDH         LINE#         60
+  C:0ECDH         LINE#         62
+  C:0ED8H         LINE#         63
+  C:0EDFH         LINE#         64
   -------         ENDPROC       _DELAY_MS
   -------         PROC          LCD_PULSE
-  C:0C9CH         LINE#         62
-  C:0C9CH         LINE#         63
-  C:0C9CH         LINE#         64
-  C:0C9EH         LINE#         65
-  C:0CA0H         LINE#         66
-  C:0CA2H         LINE#         67
+  C:102CH         LINE#         72
+  C:102CH         LINE#         73
+  C:102CH         LINE#         74
+  C:102EH         LINE#         75
+  C:1031H         LINE#         77
+  C:1033H         LINE#         78
   -------         ENDPROC       LCD_PULSE
-  -------         PROC          L?0071
-  -------         ENDPROC       L?0071
+  -------         PROC          L?0141
+  -------         ENDPROC       L?0141
   -------         PROC          _LCD_NIBBLE
   D:0007H         SYMBOL        nibble
-  C:0BBAH         LINE#         72
-  C:0BBAH         LINE#         73
-  C:0BBAH         LINE#         74
-  C:0BBEH         LINE#         75
-  C:0BC4H         LINE#         76
-  C:0BCCH         LINE#         77
-  C:0BD5H         LINE#         79
+  C:0E99H         LINE#         83
+  C:0E99H         LINE#         84
+  C:0E99H         LINE#         85
+  C:0E9DH         LINE#         86
+  C:0EA3H         LINE#         87
+  C:0EABH         LINE#         88
+  C:0EB4H         LINE#         90
   -------         ENDPROC       _LCD_NIBBLE
   -------         PROC          _LCD_CMD
   D:0001H         SYMBOL        cmd
-  C:0C55H         LINE#         84
-  C:0C57H         LINE#         85
-  C:0C57H         LINE#         86
-  C:0C59H         LINE#         88
-  C:0C59H         LINE#         89
-  C:0C5CH         LINE#         91
+  C:1007H         LINE#         95
+  C:1009H         LINE#         96
+  C:1009H         LINE#         97
+  C:100BH         LINE#         99
+  C:100BH         LINE#         100
+  C:100EH         LINE#         102
   -------         ENDPROC       _LCD_CMD
-  C:0BFAH         SYMBOL        L?0068
-  -------         PROC          L?0067
-  -------         ENDPROC       L?0067
-  C:0BFAH         SYMBOL        L?0068
+  -------         PROC          L?0138
+  -------         ENDPROC       L?0138
   -------         PROC          _LCD_DATA
   D:0001H         SYMBOL        dat
-  C:0C06H         LINE#         96
-  C:0C08H         LINE#         97
-  C:0C08H         LINE#         98
-  C:0C0AH         LINE#         100
-  C:0C0AH         LINE#         101
-  C:0C0DH         LINE#         103
+  C:0F9EH         LINE#         107
+  C:0FA0H         LINE#         108
+  C:0FA0H         LINE#         109
+  C:0FA2H         LINE#         111
+  C:0FA2H         LINE#         112
+  C:0FA5H         LINE#         114
   -------         ENDPROC       _LCD_DATA
   -------         PROC          _LCD_STRING
-  D:000AH         SYMBOL        str
-  C:0BD7H         LINE#         108
-  C:0BDDH         LINE#         109
-BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  09/14/2026  17:55:21  PAGE 5
-
-
-  C:0BDDH         LINE#         110
-  C:0BE8H         LINE#         111
-  C:0BE8H         LINE#         112
-  C:0BEAH         LINE#         113
-  C:0BF5H         LINE#         114
-  C:0BF7H         LINE#         115
+  D:001DH         SYMBOL        str
+  C:0EE0H         LINE#         119
+  C:0EE6H         LINE#         120
+  C:0EE6H         LINE#         121
+  C:0EF2H         LINE#         122
+  C:0EF2H         LINE#         123
+  C:0EF5H         LINE#         124
+  C:0F00H         LINE#         125
+  C:0F02H         LINE#         126
   -------         ENDPROC       _LCD_STRING
-  C:0C13H         SYMBOL        L?0065
-  C:0C15H         SYMBOL        L?0066
-  -------         PROC          L?0064
-  -------         ENDPROC       L?0064
-  C:0C13H         SYMBOL        L?0065
-  C:0C15H         SYMBOL        L?0066
+  C:0FC7H         SYMBOL        L?0137
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 7
+
+
+  -------         PROC          L?0136
+  -------         ENDPROC       L?0136
+  C:0FC7H         SYMBOL        L?0137
   -------         PROC          _LCD_GOTO
   D:0007H         SYMBOL        row
-  D:000AH         SYMBOL        col
-  C:0C1AH         LINE#         122
-  C:0C1CH         LINE#         123
-  C:0C1CH         LINE#         124
-  C:0C1FH         LINE#         125
-  C:0C1FH         LINE#         126
-  C:0C23H         LINE#         127
-  C:0C25H         LINE#         129
-  C:0C25H         LINE#         130
-  C:0C2CH         LINE#         131
-  C:0C2CH         LINE#         132
+  D:001BH         SYMBOL        col
+  C:0FCDH         LINE#         130
+  C:0FCFH         LINE#         131
+  C:0FCFH         LINE#         132
+  C:0FD2H         LINE#         133
+  C:0FD2H         LINE#         134
+  C:0FD6H         LINE#         135
+  C:0FD8H         LINE#         137
+  C:0FD8H         LINE#         138
+  C:0FE0H         LINE#         139
+  C:0FE0H         LINE#         140
   -------         ENDPROC       _LCD_GOTO
   -------         PROC          LCD_CLEAR
-  C:0C6EH         LINE#         136
-  C:0C6EH         LINE#         137
-  C:0C6EH         LINE#         138
-  C:0C72H         LINE#         139
+  C:1015H         LINE#         144
+  C:1015H         LINE#         145
+  C:1015H         LINE#         146
+  C:101AH         LINE#         147
   -------         ENDPROC       LCD_CLEAR
   -------         PROC          LCD_INIT
-  C:0B54H         LINE#         144
-  C:0B54H         LINE#         145
-  C:0B54H         LINE#         146
-  C:0B56H         LINE#         147
-  C:0B58H         LINE#         149
-  C:0B5EH         LINE#         152
-  C:0B62H         LINE#         153
-  C:0B68H         LINE#         155
-  C:0B68H         LINE#         156
-  C:0B6BH         LINE#         158
-  C:0B6BH         LINE#         159
-  C:0B6EH         LINE#         161
-  C:0B71H         LINE#         164
-  C:0B75H         LINE#         167
-  C:0B79H         LINE#         170
-  C:0B7DH         LINE#         173
-  C:0B81H         LINE#         175
+  C:0DC0H         LINE#         155
+  C:0DC0H         LINE#         156
+  C:0DC0H         LINE#         157
+  C:0DC2H         LINE#         158
+  C:0DC4H         LINE#         160
+  C:0DCBH         LINE#         163
+  C:0DD0H         LINE#         164
+  C:0DD7H         LINE#         166
+  C:0DD7H         LINE#         167
+  C:0DDAH         LINE#         169
+  C:0DDAH         LINE#         170
+  C:0DDDH         LINE#         172
+  C:0DE1H         LINE#         175
+  C:0DE6H         LINE#         178
+  C:0DEBH         LINE#         181
+  C:0DF0H         LINE#         184
+  C:0DF5H         LINE#         186
   -------         ENDPROC       LCD_INIT
   -------         PROC          ADC_READ
   -------         DO            
   D:0007H         SYMBOL        value
   -------         ENDDO         
-  C:0C2DH         LINE#         183
-BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  09/14/2026  17:55:21  PAGE 6
+  C:0FACH         LINE#         194
+  C:0FACH         LINE#         195
+  C:0FACH         LINE#         202
+  C:0FAEH         LINE#         203
+  C:0FB0H         LINE#         205
+  C:0FB3H         LINE#         207
+  C:0FB5H         LINE#         208
+  C:0FB7H         LINE#         217
+  C:0FBAH         LINE#         218
+  C:0FBDH         LINE#         221
+  C:0FBFH         LINE#         223
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 8
 
 
-  C:0C2DH         LINE#         184
-  C:0C2DH         LINE#         192
-  C:0C2FH         LINE#         193
-  C:0C31H         LINE#         195
-  C:0C33H         LINE#         197
-  C:0C35H         LINE#         198
-  C:0C37H         LINE#         207
-  C:0C3AH         LINE#         208
-  C:0C3DH         LINE#         211
-  C:0C3FH         LINE#         213
-  C:0C41H         LINE#         215
-  C:0C43H         LINE#         218
-  C:0C45H         LINE#         220
-  C:0C45H         LINE#         221
+  C:0FC2H         LINE#         225
+  C:0FC4H         LINE#         228
+  C:0FC6H         LINE#         230
+  C:0FC6H         LINE#         231
   -------         ENDPROC       ADC_READ
   -------         PROC          GET_TEMPERATURE
   -------         DO            
   D:0007H         SYMBOL        adc_value
   D:0006H         SYMBOL        temperature
   -------         ENDDO         
-  C:0C46H         LINE#         228
-  C:0C46H         LINE#         229
-  C:0C46H         LINE#         233
-  C:0C48H         LINE#         249
-  C:0C54H         LINE#         251
-  C:0C54H         LINE#         252
+  C:0FF6H         LINE#         238
+  C:0FF6H         LINE#         239
+  C:0FF6H         LINE#         243
+  C:0FF9H         LINE#         258
+  C:1006H         LINE#         260
+  C:1006H         LINE#         261
   -------         ENDPROC       GET_TEMPERATURE
+  -------         PROC          _DISPLAY_TEMPERATURE
+  D:001BH         SYMBOL        temperature
+  C:0CB1H         LINE#         268
+  C:0CB5H         LINE#         269
+  C:0CB5H         LINE#         270
+  C:0CBEH         LINE#         272
+  C:0CC9H         LINE#         273
+  C:0CC9H         LINE#         274
+  C:0CCEH         LINE#         275
+  C:0CE7H         LINE#         276
+  C:0CF3H         LINE#         277
+  C:0CF5H         LINE#         278
+  C:0D00H         LINE#         279
+  C:0D00H         LINE#         280
+  C:0D05H         LINE#         281
+  C:0D11H         LINE#         282
+  C:0D13H         LINE#         284
+  C:0D13H         LINE#         285
+  C:0D1BH         LINE#         286
+  C:0D1BH         LINE#         288
+  -------         ENDPROC       _DISPLAY_TEMPERATURE
   -------         PROC          INDICATORS_OFF
-  C:0C78H         LINE#         260
-  C:0C78H         LINE#         261
-  C:0C78H         LINE#         262
-  C:0C7AH         LINE#         263
-  C:0C7CH         LINE#         264
-  C:0C7EH         LINE#         265
-  C:0C80H         LINE#         266
+  C:1036H         LINE#         297
+  C:1036H         LINE#         298
+  C:1036H         LINE#         299
+  C:1038H         LINE#         300
+  C:103AH         LINE#         301
+  C:103CH         LINE#         302
+  C:103EH         LINE#         303
   -------         ENDPROC       INDICATORS_OFF
   -------         PROC          NORMAL_CONDITION
-  C:0C81H         LINE#         270
-  C:0C81H         LINE#         271
-  C:0C81H         LINE#         272
-  C:0C83H         LINE#         273
-  C:0C85H         LINE#         274
-  C:0C87H         LINE#         275
-  C:0C89H         LINE#         276
+  C:103FH         LINE#         307
+  C:103FH         LINE#         308
+  C:103FH         LINE#         309
+  C:1041H         LINE#         310
+  C:1043H         LINE#         311
+  C:1045H         LINE#         312
+  C:1047H         LINE#         313
   -------         ENDPROC       NORMAL_CONDITION
   -------         PROC          WARNING_CONDITION
-  C:0C8AH         LINE#         280
-  C:0C8AH         LINE#         281
-  C:0C8AH         LINE#         282
-  C:0C8CH         LINE#         283
-  C:0C8EH         LINE#         284
-  C:0C90H         LINE#         285
-  C:0C92H         LINE#         286
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 9
+
+
+  C:1048H         LINE#         317
+  C:1048H         LINE#         318
+  C:1048H         LINE#         319
+  C:104AH         LINE#         320
+  C:104CH         LINE#         321
+  C:104EH         LINE#         322
+  C:1050H         LINE#         323
   -------         ENDPROC       WARNING_CONDITION
   -------         PROC          ALARM_CONDITION
-  C:0C93H         LINE#         290
-  C:0C93H         LINE#         291
-BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  09/14/2026  17:55:21  PAGE 7
-
-
-  C:0C93H         LINE#         292
-  C:0C95H         LINE#         293
-  C:0C97H         LINE#         294
-  C:0C99H         LINE#         295
-  C:0C9BH         LINE#         296
+  C:1051H         LINE#         327
+  C:1051H         LINE#         328
+  C:1051H         LINE#         329
+  C:1053H         LINE#         330
+  C:1055H         LINE#         331
+  C:1057H         LINE#         332
+  C:1059H         LINE#         333
   -------         ENDPROC       ALARM_CONDITION
+  -------         PROC          DISPLAY_MULTIPLE_SENSORS
+  C:0D7CH         LINE#         353
+  C:0D7CH         LINE#         354
+  C:0D7CH         LINE#         355
+  C:0D7CH         LINE#         357
+  C:0D7FH         LINE#         358
+  C:0D88H         LINE#         360
+  C:0D8FH         LINE#         362
+  C:0D92H         LINE#         363
+  C:0D92H         LINE#         364
+  C:0D9BH         LINE#         365
+  C:0D9BH         LINE#         367
+  C:0D9EH         LINE#         368
+  C:0D9EH         LINE#         369
+  C:0DA7H         LINE#         370
+  C:0DA7H         LINE#         372
+  C:0DAAH         LINE#         373
+  C:0DAAH         LINE#         374
+  C:0DB3H         LINE#         375
+  C:0DB3H         LINE#         377
+  C:0DB6H         LINE#         378
+  C:0DB6H         LINE#         379
+  C:0DBFH         LINE#         380
+  C:0DBFH         LINE#         381
+  -------         ENDPROC       DISPLAY_MULTIPLE_SENSORS
+  -------         PROC          DISPLAY_FLAME_ALERT
+  C:0F21H         LINE#         388
+  C:0F21H         LINE#         389
+  C:0F21H         LINE#         390
+  C:0F21H         LINE#         392
+  C:0F24H         LINE#         393
+  C:0F2DH         LINE#         395
+  C:0F34H         LINE#         396
+  -------         ENDPROC       DISPLAY_FLAME_ALERT
+  -------         PROC          DISPLAY_GAS_ALERT
+  C:0F3DH         LINE#         404
+  C:0F3DH         LINE#         405
+  C:0F3DH         LINE#         406
+  C:0F3DH         LINE#         408
+  C:0F40H         LINE#         409
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 10
+
+
+  C:0F49H         LINE#         411
+  C:0F50H         LINE#         412
+  -------         ENDPROC       DISPLAY_GAS_ALERT
+  -------         PROC          DISPLAY_VIBRATION_ALERT
+  C:0F59H         LINE#         420
+  C:0F59H         LINE#         421
+  C:0F59H         LINE#         422
+  C:0F59H         LINE#         424
+  C:0F5CH         LINE#         425
+  C:0F65H         LINE#         427
+  C:0F6CH         LINE#         428
+  -------         ENDPROC       DISPLAY_VIBRATION_ALERT
+  -------         PROC          DISPLAY_EMERGENCY_ALERT
+  C:0F75H         LINE#         436
+  C:0F75H         LINE#         437
+  C:0F75H         LINE#         438
+  C:0F75H         LINE#         440
+  C:0F78H         LINE#         441
+  C:0F81H         LINE#         443
+  C:0F88H         LINE#         444
+  -------         ENDPROC       DISPLAY_EMERGENCY_ALERT
+  -------         PROC          _DISPLAY_CRITICAL_TEMPERATURE
+  D:0019H         SYMBOL        temperature
+  C:0F03H         LINE#         452
+  C:0F07H         LINE#         453
+  C:0F07H         LINE#         454
+  C:0F07H         LINE#         456
+  C:0F0AH         LINE#         457
+  C:0F13H         LINE#         459
+  C:0F1AH         LINE#         461
+  -------         ENDPROC       _DISPLAY_CRITICAL_TEMPERATURE
+  -------         PROC          TIMER0_INIT
+  C:0FE1H         LINE#         480
+  C:0FE1H         LINE#         481
+  C:0FE1H         LINE#         482
+  C:0FE9H         LINE#         483
+  C:0FECH         LINE#         484
+  C:0FEFH         LINE#         485
+  C:0FF1H         LINE#         486
+  C:0FF3H         LINE#         487
+  C:0FF5H         LINE#         488
+  -------         ENDPROC       TIMER0_INIT
+  -------         PROC          TIMER0_ISR
+  C:0E62H         LINE#         490
+  C:0E66H         LINE#         492
+  C:0E69H         LINE#         493
+  C:0E6CH         LINE#         494
+  C:0E74H         LINE#         495
+  C:0E7FH         LINE#         496
+  C:0E7FH         LINE#         497
+  C:0E85H         LINE#         498
+  C:0E88H         LINE#         499
+  C:0E88H         LINE#         500
+  -------         ENDPROC       TIMER0_ISR
+  -------         PROC          _CALCULATE_INDEX
+  D:0006H         SYMBOL        temperature
+  D:0005H         SYMBOL        flame
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 11
+
+
+  D:0003H         SYMBOL        gas
+  D:001AH         SYMBOL        vibration
+  D:001BH         SYMBOL        emergency
+  -------         DO            
+  D:0082H         SYMBOL        risk
+  -------         ENDDO         
+  C:0C38H         LINE#         502
+  C:0C38H         LINE#         507
+  C:0C38H         LINE#         508
+  C:0C3BH         LINE#         509
+  C:0C42H         LINE#         510
+  C:0C4FH         LINE#         511
+  C:0C5CH         LINE#         512
+  C:0C70H         LINE#         513
+  C:0C7EH         LINE#         514
+  C:0C8CH         LINE#         515
+  C:0C9BH         LINE#         516
+  C:0CA9H         LINE#         517
+  C:0CB0H         LINE#         518
+  -------         ENDPROC       _CALCULATE_INDEX
+  -------         PROC          _CLASSIFY_ALARM
+  D:0006H         SYMBOL        temperature
+  D:0005H         SYMBOL        flame
+  D:0003H         SYMBOL        gas
+  D:001AH         SYMBOL        vibration
+  D:001BH         SYMBOL        emergency
+  C:0DFCH         LINE#         520
+  C:0DFCH         LINE#         525
+  C:0DFCH         LINE#         526
+  C:0E03H         LINE#         527
+  C:0E15H         LINE#         528
+  C:0E25H         LINE#         529
+  C:0E31H         LINE#         530
+  C:0E33H         LINE#         531
+  -------         ENDPROC       _CLASSIFY_ALARM
+  -------         PROC          _LCD_NUMBER3
+  D:0018H         SYMBOL        number
+  C:0E34H         LINE#         533
+  C:0E36H         LINE#         534
+  C:0E36H         LINE#         535
+  C:0E42H         LINE#         536
+  C:0E54H         LINE#         537
+  -------         ENDPROC       _LCD_NUMBER3
+  -------         PROC          _DISPLAY_INDEX_STATUS
+  D:0016H         SYMBOL        index
+  D:0017H         SYMBOL        state
+  C:0D24H         LINE#         540
+  C:0D28H         LINE#         541
+  C:0D28H         LINE#         542
+  C:0D28H         LINE#         543
+  C:0D2BH         LINE#         544
+  C:0D34H         LINE#         545
+  C:0D39H         LINE#         546
+  C:0D40H         LINE#         547
+  C:0D4DH         LINE#         548
+  C:0D5AH         LINE#         549
+  C:0D67H         LINE#         550
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 12
+
+
+  C:0D74H         LINE#         551
+  C:0D7BH         LINE#         552
+  -------         ENDPROC       _DISPLAY_INDEX_STATUS
+  -------         PROC          _DISPLAY_SENSOR_DETAILS
+  D:0016H         SYMBOL        temperature
+  D:0018H         SYMBOL        alarm_count
+  C:0B37H         LINE#         555
+  C:0B3DH         LINE#         557
+  C:0B3DH         LINE#         558
+  C:0B43H         LINE#         559
+  C:0B55H         LINE#         560
+  C:0B5FH         LINE#         561
+  C:0B65H         LINE#         562
+  C:0B6BH         LINE#         563
+  C:0B71H         LINE#         564
+  C:0B7CH         LINE#         565
+  C:0B7CH         LINE#         566
+  C:0B7CH         LINE#         567
+  C:0B7FH         LINE#         568
+  C:0B85H         LINE#         569
+  C:0B85H         LINE#         570
+  C:0B85H         LINE#         571
+  C:0B87H         LINE#         572
+  C:0B92H         LINE#         573
+  C:0B92H         LINE#         574
+  C:0B92H         LINE#         575
+  C:0B95H         LINE#         576
+  C:0B9BH         LINE#         577
+  C:0B9BH         LINE#         578
+  C:0B9BH         LINE#         579
+  C:0B9DH         LINE#         581
+  C:0B9DH         LINE#         582
+  C:0B9DH         LINE#         583
+  C:0BA0H         LINE#         584
+  C:0BA9H         LINE#         585
+  C:0BB0H         LINE#         586
+  C:0BB7H         LINE#         587
+  C:0BB7H         LINE#         588
+  -------         ENDPROC       _DISPLAY_SENSOR_DETAILS
   -------         PROC          MAIN
   -------         DO            
   D:0008H         SYMBOL        temperature
-  D:0007H         SYMBOL        alarm_count
+  D:000AH         SYMBOL        alarm_count
+  D:000BH         SYMBOL        flame_active
+  D:0004H         SYMBOL        gas_active
+  D:0002H         SYMBOL        vibration_active
+  D:0001H         SYMBOL        emergency_active
+  D:000CH         SYMBOL        safety_index
+  D:000DH         SYMBOL        alarm_state
+  D:000EH         SYMBOL        previous_state
+  D:000FH         SYMBOL        previous_screen
+  D:0010H         SYMBOL        previous_index
+  D:0011H         SYMBOL        previous_temperature
+  D:0013H         SYMBOL        previous_count
+  D:0014H         SYMBOL        previous_flags
+  D:0015H         SYMBOL        flags
+  D:0007H         SYMBOL        refresh
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 13
+
+
   -------         ENDDO         
-  C:0800H         LINE#         303
-  C:0800H         LINE#         304
-  C:0800H         LINE#         309
-  C:0803H         LINE#         310
-  C:0806H         LINE#         311
-  C:0809H         LINE#         312
-  C:080CH         LINE#         315
-  C:080EH         LINE#         318
-  C:080EH         LINE#         320
-  C:0810H         LINE#         321
-  C:0818H         LINE#         323
-  C:081EH         LINE#         324
-  C:0826H         LINE#         326
-  C:082CH         LINE#         328
-  C:082EH         LINE#         335
-  C:082EH         LINE#         336
-  C:082EH         LINE#         340
-  C:0834H         LINE#         353
-  C:0836H         LINE#         355
-  C:0839H         LINE#         356
-  C:0839H         LINE#         357
-  C:083AH         LINE#         358
-  C:083AH         LINE#         360
-  C:083DH         LINE#         361
-  C:083DH         LINE#         362
-  C:083EH         LINE#         363
-  C:083EH         LINE#         365
-  C:0841H         LINE#         366
-  C:0841H         LINE#         367
-  C:0842H         LINE#         368
-  C:0842H         LINE#         370
-  C:0845H         LINE#         371
-  C:0845H         LINE#         372
-  C:0846H         LINE#         373
-  C:0846H         LINE#         389
-  C:0857H         LINE#         390
-  C:0857H         LINE#         391
-  C:0857H         LINE#         393
-  C:0857H         LINE#         395
-  C:085AH         LINE#         396
-  C:0862H         LINE#         398
-  C:0868H         LINE#         400
-  C:0875H         LINE#         401
-  C:0875H         LINE#         402
-  C:087BH         LINE#         403
-  C:087DH         LINE#         405
-BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  09/14/2026  17:55:21  PAGE 8
+  C:0800H         LINE#         593
+  C:0800H         LINE#         594
+  C:0800H         LINE#         599
+  C:0803H         LINE#         600
+  C:0806H         LINE#         601
+  C:0809H         LINE#         602
+  C:080FH         LINE#         603
+  C:0811H         LINE#         604
+  C:0813H         LINE#         609
+  C:0815H         LINE#         610
+  C:0818H         LINE#         611
+  C:081BH         LINE#         612
+  C:081EH         LINE#         614
+  C:0821H         LINE#         615
+  C:0821H         LINE#         616
+  C:0824H         LINE#         617
+  C:082DH         LINE#         618
+  C:0834H         LINE#         619
+  C:083DH         LINE#         620
+  C:0844H         LINE#         621
+  C:0847H         LINE#         622
+  C:084AH         LINE#         624
+  C:084AH         LINE#         625
+  C:084AH         LINE#         626
+  C:0851H         LINE#         627
+  C:085CH         LINE#         628
+  C:0867H         LINE#         629
+  C:0872H         LINE#         630
+  C:087DH         LINE#         632
+  C:0884H         LINE#         634
+  C:089AH         LINE#         637
+  C:08ABH         LINE#         639
+  C:08BAH         LINE#         643
+  C:08C5H         LINE#         644
+  C:08CAH         LINE#         645
+  C:08D5H         LINE#         646
+  C:08DAH         LINE#         648
+  C:08DDH         LINE#         651
+  C:08DFH         LINE#         652
+  C:08E3H         LINE#         653
+  C:08E3H         LINE#         654
+  C:08E5H         LINE#         655
+  C:08E8H         LINE#         656
+  C:08EAH         LINE#         657
+  C:08F6H         LINE#         658
+  C:08F8H         LINE#         659
+  C:08F8H         LINE#         662
+  C:090BH         LINE#         664
+  C:090BH         LINE#         665
+  C:090EH         LINE#         666
+  C:0910H         LINE#         667
+  C:0912H         LINE#         668
+  C:0917H         LINE#         669
+  C:0919H         LINE#         670
+  C:091BH         LINE#         671
+  C:091BH         LINE#         673
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/19/2026  17:47:33  PAGE 14
 
 
-  C:087DH         LINE#         406
-  C:0883H         LINE#         407
-  C:0883H         LINE#         408
-  C:0885H         LINE#         416
-  C:0888H         LINE#         417
-  C:0888H         LINE#         418
-  C:0888H         LINE#         420
-  C:0888H         LINE#         422
-  C:088BH         LINE#         423
-  C:0893H         LINE#         425
-  C:0899H         LINE#         426
-  C:08A1H         LINE#         427
-  C:08A3H         LINE#         435
-  C:08A6H         LINE#         436
-  C:08A6H         LINE#         437
-  C:08A6H         LINE#         439
-  C:08A6H         LINE#         441
-  C:08A8H         LINE#         442
-  C:08B0H         LINE#         444
-  C:08B6H         LINE#         445
-  C:08BEH         LINE#         446
-  C:08C0H         LINE#         454
-  C:08C3H         LINE#         455
-  C:08C3H         LINE#         456
-  C:08C3H         LINE#         458
-  C:08C3H         LINE#         460
-  C:08C5H         LINE#         461
-  C:08CDH         LINE#         463
-  C:08D3H         LINE#         464
-  C:08DBH         LINE#         465
-  C:08DDH         LINE#         473
-  C:08E0H         LINE#         474
-  C:08E0H         LINE#         475
-  C:08E2H         LINE#         476
-  C:08E4H         LINE#         477
-  C:08E6H         LINE#         478
-  C:08E8H         LINE#         480
-  C:08E8H         LINE#         482
-  C:08EAH         LINE#         483
-  C:08F2H         LINE#         485
-  C:08F8H         LINE#         486
-  C:0900H         LINE#         487
-  C:0902H         LINE#         498
-  C:090DH         LINE#         499
-  C:090DH         LINE#         500
-  C:090DH         LINE#         502
-  C:090DH         LINE#         504
-  C:090FH         LINE#         505
-  C:0917H         LINE#         507
-  C:091DH         LINE#         508
-  C:0925H         LINE#         509
-  C:0927H         LINE#         519
-  C:0932H         LINE#         520
-  C:0932H         LINE#         521
-  C:0934H         LINE#         523
-  C:0934H         LINE#         525
-  C:0936H         LINE#         526
-BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  09/14/2026  17:55:21  PAGE 9
-
-
-  C:093EH         LINE#         528
-  C:0944H         LINE#         529
-  C:094CH         LINE#         532
-  C:094FH         LINE#         533
-  C:095FH         LINE#         534
-  C:095FH         LINE#         535
-  C:0961H         LINE#         547
-  C:0961H         LINE#         548
-  C:0963H         LINE#         550
-  C:0963H         LINE#         552
-  C:0965H         LINE#         553
-  C:096DH         LINE#         555
-  C:0973H         LINE#         556
-  C:097BH         LINE#         559
-  C:0986H         LINE#         560
-  C:0986H         LINE#         561
-  C:098AH         LINE#         562
-  C:09A0H         LINE#         563
-  C:09ABH         LINE#         564
-  C:09ADH         LINE#         565
-  C:09B8H         LINE#         566
-  C:09B8H         LINE#         567
-  C:09BBH         LINE#         568
-  C:09C6H         LINE#         569
-  C:09C8H         LINE#         571
-  C:09C8H         LINE#         572
-  C:09CFH         LINE#         573
-  C:09CFH         LINE#         575
-  C:09D7H         LINE#         576
-  C:09D7H         LINE#         580
-  C:09DDH         LINE#         581
+  C:0944H         LINE#         679
+  C:0946H         LINE#         681
+  C:0949H         LINE#         682
+  C:0949H         LINE#         683
+  C:094DH         LINE#         684
+  C:0956H         LINE#         686
+  C:095FH         LINE#         687
+  C:095FH         LINE#         689
+  C:0962H         LINE#         690
+  C:0965H         LINE#         691
+  C:0968H         LINE#         692
+  C:096EH         LINE#         693
+  C:0971H         LINE#         694
+  C:0974H         LINE#         696
   -------         ENDPROC       MAIN
   -------         ENDMOD        ALARM_SYSTEM
 
   -------         MODULE        ?C?CLDPTR
-  C:0AD4H         PUBLIC        ?C?CLDPTR
+  C:0BB8H         PUBLIC        ?C?CLDPTR
   -------         ENDMOD        ?C?CLDPTR
 
   -------         MODULE        ?C?IMUL
-  C:0AEDH         PUBLIC        ?C?IMUL
+  C:0BD1H         PUBLIC        ?C?IMUL
   -------         ENDMOD        ?C?IMUL
 
   -------         MODULE        ?C?UIDIV
-  C:0AFFH         PUBLIC        ?C?UIDIV
+  C:0BE3H         PUBLIC        ?C?UIDIV
   -------         ENDMOD        ?C?UIDIV
 
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
     SEGMENT: ?PR?INDICATORS_OFF?ALARM_SYSTEM
 
 ******************************************************************************
-* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0418H BYTE (51%) *
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0750H BYTE (91%) *
 ******************************************************************************
 
-Program Size: data=14.0 xdata=0 code=1191
+Program Size: data=37.0 xdata=0 code=2144
 LINK/LOCATE RUN COMPLETE.  1 WARNING(S),  0 ERROR(S)
