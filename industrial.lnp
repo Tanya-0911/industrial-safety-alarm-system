@@ -1,3 +1,0 @@
-".\Objects\alarm_system.obj" 
-TO ".\Objects\industrial" 
-PRINT(".\Listings\industrial.m51") RAMSIZE(256) 
