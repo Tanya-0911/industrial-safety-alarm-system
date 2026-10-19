@@ -1,0 +1,743 @@
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE ALARM_SYSTEM
+OBJECT MODULE PLACED IN .\Objects\alarm_system.obj
+COMPILER INVOKED BY: C:\Users\sinha\Desktop\C51\BIN\C51.EXE alarm_system.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND P
+                    -RINT(.\Listings\alarm_system.lst) TABS(2) OBJECT(.\Objects\alarm_system.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          
+   3          /* =========================================================
+   4             PORT DEFINITIONS
+   5             ========================================================= */
+   6          
+   7          /* ADC0808 data bus */
+   8          #define ADC_DATA P0
+   9          
+  10          /* ADC0808 control pins */
+  11          sbit ADC_ALE   = P3^0;
+  12          sbit ADC_START = P3^1;
+  13          sbit ADC_EOC   = P3^2;
+  14          sbit ADC_OE    = P3^3;
+  15          
+  16          sbit LCD_RS = P2^0;
+  17          sbit LCD_EN = P2^1;
+  18          
+  19          /* LCD data pins - 4 bit mode */
+  20          sbit LCD_D4 = P2^4;
+  21          sbit LCD_D5 = P2^5;
+  22          sbit LCD_D6 = P2^6;
+  23          sbit LCD_D7 = P2^7;
+  24          
+  25          /* =========================================================
+  26             SAFETY INPUTS
+  27             ACTIVE LOW
+  28          
+  29             Sensor/switch released = 1
+  30             Sensor/switch active   = 0
+  31             ========================================================= */
+  32          
+  33          sbit FLAME     = P1^0;
+  34          sbit GAS       = P1^1;
+  35          sbit VIBRATION = P1^2;
+  36          sbit EMERGENCY = P1^3;
+  37          
+  38          /* =========================================================
+  39             INDICATORS
+  40             ========================================================= */
+  41          
+  42          sbit GREEN_LED  = P1^4;
+  43          sbit YELLOW_LED = P1^5;
+  44          sbit RED_LED    = P1^6;
+  45          sbit BUZZER     = P1^7;
+  46          
+  47          
+  48          /* =========================================================
+  49             DELAY FUNCTION
+  50             Crystal = 11.0592 MHz
+  51             ========================================================= */
+  52          
+  53          void delay_ms(unsigned int ms)
+  54          {
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 2   
+
+  55   1          unsigned int i, j;
+  56   1      
+  57   1          for(i = 0; i < ms; i++)
+  58   1          {
+  59   2              for(j = 0; j < 123; j++)
+  60   2              {
+  61   3                  ;
+  62   3              }
+  63   2          }
+  64   1      }
+  65          
+  66          
+  67          /* =========================================================
+  68             LCD FUNCTIONS
+  69             ========================================================= */
+  70          
+  71          /* Generate LCD Enable pulse */
+  72          void lcd_pulse(void)
+  73          {
+  74   1          LCD_EN = 1;
+  75   1          delay_ms(1);
+  76   1      
+  77   1          LCD_EN = 0;
+  78   1          delay_ms(1);
+  79   1      }
+  80          
+  81          
+  82          /* Send one 4-bit nibble */
+  83          void lcd_nibble(unsigned char nibble)
+  84          {
+  85   1          LCD_D4 = (nibble >> 0) & 1;
+  86   1          LCD_D5 = (nibble >> 1) & 1;
+  87   1          LCD_D6 = (nibble >> 2) & 1;
+  88   1          LCD_D7 = (nibble >> 3) & 1;
+  89   1      
+  90   1          lcd_pulse();
+  91   1      }
+  92          
+  93          
+  94          /* Send command to LCD */
+  95          void lcd_cmd(unsigned char cmd)
+  96          {
+  97   1          LCD_RS = 0;
+  98   1      
+  99   1          lcd_nibble(cmd >> 4);
+ 100   1          lcd_nibble(cmd & 0x0F);
+ 101   1      
+ 102   1          delay_ms(2);
+ 103   1      }
+ 104          
+ 105          
+ 106          /* Send character to LCD */
+ 107          void lcd_data(unsigned char dat)
+ 108          {
+ 109   1          LCD_RS = 1;
+ 110   1      
+ 111   1          lcd_nibble(dat >> 4);
+ 112   1          lcd_nibble(dat & 0x0F);
+ 113   1      
+ 114   1          delay_ms(1);
+ 115   1      }
+ 116          
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 3   
+
+ 117          
+ 118          /* Send string to LCD */
+ 119          void lcd_string(char *str)
+ 120          {
+ 121   1          while(*str)
+ 122   1          {
+ 123   2              lcd_data(*str);
+ 124   2              str++;
+ 125   2          }
+ 126   1      }
+ 127          
+ 128          
+ 129          /* Set LCD cursor position */
+ 130          void lcd_goto(unsigned char row, unsigned char col)
+ 131          {
+ 132   1          if(row == 0)
+ 133   1          {
+ 134   2              lcd_cmd(0x80 + col);
+ 135   2          }
+ 136   1          else
+ 137   1          {
+ 138   2              lcd_cmd(0xC0 + col);
+ 139   2          }
+ 140   1      }
+ 141          
+ 142          
+ 143          /* Clear LCD */
+ 144          void lcd_clear(void)
+ 145          {
+ 146   1          lcd_cmd(0x01);
+ 147   1          delay_ms(2);
+ 148   1      }
+ 149          
+ 150          
+ 151          /* =========================================================
+ 152             LCD INITIALIZATION
+ 153             ========================================================= */
+ 154          
+ 155          void lcd_init(void)
+ 156          {
+ 157   1          LCD_RS = 0;
+ 158   1          LCD_EN = 0;
+ 159   1      
+ 160   1          delay_ms(20);
+ 161   1      
+ 162   1          /* Force LCD into 4-bit mode */
+ 163   1          lcd_nibble(0x03);
+ 164   1          delay_ms(5);
+ 165   1      
+ 166   1          lcd_nibble(0x03);
+ 167   1          delay_ms(1);
+ 168   1      
+ 169   1          lcd_nibble(0x03);
+ 170   1          delay_ms(1);
+ 171   1      
+ 172   1          lcd_nibble(0x02);
+ 173   1      
+ 174   1          /* 4-bit mode, 2 lines, 5x8 font */
+ 175   1          lcd_cmd(0x28);
+ 176   1      
+ 177   1          /* Display ON, cursor OFF */
+ 178   1          lcd_cmd(0x0C);
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 4   
+
+ 179   1      
+ 180   1          /* Entry mode */
+ 181   1          lcd_cmd(0x06);
+ 182   1      
+ 183   1          /* Clear display */
+ 184   1          lcd_cmd(0x01);
+ 185   1      
+ 186   1          delay_ms(5);
+ 187   1      }
+ 188          
+ 189          
+ 190          /* =========================================================
+ 191             ADC0808 FUNCTION
+ 192             ========================================================= */
+ 193          
+ 194          unsigned char adc_read(void)
+ 195          {
+ 196   1          unsigned char value;
+ 197   1      
+ 198   1          /*
+ 199   1             Start ADC conversion
+ 200   1          */
+ 201   1      
+ 202   1          ADC_ALE = 1;
+ 203   1          ADC_START = 1;
+ 204   1      
+ 205   1          delay_ms(1);
+ 206   1      
+ 207   1          ADC_ALE = 0;
+ 208   1          ADC_START = 0;
+ 209   1      
+ 210   1          /*
+ 211   1             Wait for conversion.
+ 212   1      
+ 213   1             EOC LOW  = conversion in progress
+ 214   1             EOC HIGH = conversion complete
+ 215   1          */
+ 216   1      
+ 217   1          while(ADC_EOC == 1);
+ 218   1          while(ADC_EOC == 0);
+ 219   1      
+ 220   1          /* Enable ADC output */
+ 221   1          ADC_OE = 1;
+ 222   1      
+ 223   1          delay_ms(1);
+ 224   1      
+ 225   1          value = ADC_DATA;
+ 226   1      
+ 227   1          /* Disable ADC output */
+ 228   1          ADC_OE = 0;
+ 229   1      
+ 230   1          return value;
+ 231   1      }
+ 232          
+ 233          
+ 234          /* =========================================================
+ 235             TEMPERATURE CALCULATION
+ 236             ========================================================= */
+ 237          
+ 238          unsigned int get_temperature(void)
+ 239          {
+ 240   1          unsigned char adc_value;
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 5   
+
+ 241   1          unsigned int temperature;
+ 242   1      
+ 243   1          adc_value = adc_read();
+ 244   1      
+ 245   1          /*
+ 246   1             ADC0808:
+ 247   1             VREF+ = 5V
+ 248   1             VREF- = 0V
+ 249   1      
+ 250   1             8-bit ADC = 256 levels
+ 251   1      
+ 252   1             LM35:
+ 253   1             10 mV / degree C
+ 254   1      
+ 255   1             Temperature = ADC value * 500 / 256
+ 256   1          */
+ 257   1      
+ 258   1          temperature = ((unsigned int)adc_value * 500) / 256;
+ 259   1      
+ 260   1          return temperature;
+ 261   1      }
+ 262          
+ 263          
+ 264          /* =========================================================
+ 265             TEMPERATURE DISPLAY
+ 266             ========================================================= */
+ 267          
+ 268          void display_temperature(unsigned int temperature)
+ 269          {
+ 270   1          lcd_string("TEMP: ");
+ 271   1      
+ 272   1          if(temperature >= 100)
+ 273   1          {
+ 274   2              lcd_data((temperature / 100) + '0');
+ 275   2              lcd_data(((temperature / 10) % 10) + '0');
+ 276   2              lcd_data((temperature % 10) + '0');
+ 277   2          }
+ 278   1          else if(temperature >= 10)
+ 279   1          {
+ 280   2              lcd_data((temperature / 10) + '0');
+ 281   2              lcd_data((temperature % 10) + '0');
+ 282   2          }
+ 283   1          else
+ 284   1          {
+ 285   2              lcd_data(temperature + '0');
+ 286   2          }
+ 287   1      
+ 288   1          lcd_string(" C");
+ 289   1      }
+ 290          
+ 291          
+ 292          /* =========================================================
+ 293             INDICATOR FUNCTIONS
+ 294             ========================================================= */
+ 295          
+ 296          /* Turn all indicators OFF */
+ 297          void indicators_off(void)
+ 298          {
+ 299   1          GREEN_LED  = 0;
+ 300   1          YELLOW_LED = 0;
+ 301   1          RED_LED    = 0;
+ 302   1          BUZZER     = 0;
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 6   
+
+ 303   1      }
+ 304          
+ 305          
+ 306          /* Normal condition */
+ 307          void normal_condition(void)
+ 308          {
+ 309   1          GREEN_LED  = 1;
+ 310   1          YELLOW_LED = 1;
+ 311   1          RED_LED    = 0;
+ 312   1          BUZZER     = 0;
+ 313   1      }
+ 314          
+ 315          
+ 316          /* Warning condition */
+ 317          void warning_condition(void)
+ 318          {
+ 319   1          GREEN_LED  = 1;
+ 320   1          YELLOW_LED = 0;
+ 321   1          RED_LED    = 1;
+ 322   1          BUZZER     = 0;
+ 323   1      }
+ 324          
+ 325          
+ 326          /* Alarm condition */
+ 327          void alarm_condition(void)
+ 328          {
+ 329   1          GREEN_LED  = 0;
+ 330   1          YELLOW_LED = 1;
+ 331   1          RED_LED    = 1;
+ 332   1          BUZZER     = 1;
+ 333   1      }
+ 334          
+ 335          
+ 336          /* =========================================================
+ 337             DISPLAY MULTIPLE ACTIVE SENSORS
+ 338             =========================================================
+ 339          
+ 340             LCD line 1:
+ 341                 MULTI SENSOR
+ 342          
+ 343             LCD line 2:
+ 344                 FLAME GAS VIB
+ 345          
+ 346             Abbreviations:
+ 347                 FLAME = FLAME
+ 348                 GAS   = GAS
+ 349                 VIB   = VIB
+ 350                 EMG   = EMG
+ 351             ========================================================= */
+ 352          
+ 353          void display_multiple_sensors(void)
+ 354          {
+ 355   1          lcd_clear();
+ 356   1      
+ 357   1          lcd_goto(0,0);
+ 358   1          lcd_string("MULTI SENSOR");
+ 359   1      
+ 360   1          lcd_goto(1,0);
+ 361   1      
+ 362   1          if(FLAME == 0)
+ 363   1          {
+ 364   2              lcd_string("FLAME ");
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 7   
+
+ 365   2          }
+ 366   1      
+ 367   1          if(GAS == 0)
+ 368   1          {
+ 369   2              lcd_string("GAS ");
+ 370   2          }
+ 371   1      
+ 372   1          if(VIBRATION == 0)
+ 373   1          {
+ 374   2              lcd_string("VIB ");
+ 375   2          }
+ 376   1      
+ 377   1          if(EMERGENCY == 0)
+ 378   1          {
+ 379   2              lcd_string("EMG");
+ 380   2          }
+ 381   1      }
+ 382          
+ 383          
+ 384          /* =========================================================
+ 385             DISPLAY SINGLE FLAME ALERT
+ 386             ========================================================= */
+ 387          
+ 388          void display_flame_alert(void)
+ 389          {
+ 390   1          lcd_clear();
+ 391   1      
+ 392   1          lcd_goto(0,0);
+ 393   1          lcd_string("FLAME ALERT");
+ 394   1      
+ 395   1          lcd_goto(1,0);
+ 396   1          lcd_string("FIRE DETECTED");
+ 397   1      }
+ 398          
+ 399          
+ 400          /* =========================================================
+ 401             DISPLAY SINGLE GAS ALERT
+ 402             ========================================================= */
+ 403          
+ 404          void display_gas_alert(void)
+ 405          {
+ 406   1          lcd_clear();
+ 407   1      
+ 408   1          lcd_goto(0,0);
+ 409   1          lcd_string("GAS ALERT");
+ 410   1      
+ 411   1          lcd_goto(1,0);
+ 412   1          lcd_string("GAS DETECTED");
+ 413   1      }
+ 414          
+ 415          
+ 416          /* =========================================================
+ 417             DISPLAY SINGLE VIBRATION ALERT
+ 418             ========================================================= */
+ 419          
+ 420          void display_vibration_alert(void)
+ 421          {
+ 422   1          lcd_clear();
+ 423   1      
+ 424   1          lcd_goto(0,0);
+ 425   1          lcd_string("VIBRATION ALERT");
+ 426   1      
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 8   
+
+ 427   1          lcd_goto(1,0);
+ 428   1          lcd_string("VIBRATION HIGH");
+ 429   1      }
+ 430          
+ 431          
+ 432          /* =========================================================
+ 433             DISPLAY EMERGENCY ALERT
+ 434             ========================================================= */
+ 435          
+ 436          void display_emergency_alert(void)
+ 437          {
+ 438   1          lcd_clear();
+ 439   1      
+ 440   1          lcd_goto(0,0);
+ 441   1          lcd_string("EMERGENCY");
+ 442   1      
+ 443   1          lcd_goto(1,0);
+ 444   1          lcd_string("SWITCH ACTIVE");
+ 445   1      }
+ 446          
+ 447          
+ 448          /* =========================================================
+ 449             DISPLAY CRITICAL TEMPERATURE
+ 450             ========================================================= */
+ 451          
+ 452          void display_critical_temperature(unsigned int temperature)
+ 453          {
+ 454   1          lcd_clear();
+ 455   1      
+ 456   1          lcd_goto(0,0);
+ 457   1          lcd_string("TEMP CRITICAL");
+ 458   1      
+ 459   1          lcd_goto(1,0);
+ 460   1      
+ 461   1          display_temperature(temperature);
+ 462   1      }
+ 463          
+ 464          
+ 465          /* =========================================================
+ 466             ADDED: SAFETY INDEX AND ALARM CLASSIFICATION
+ 467             ========================================================= */
+ 468          #define STATE_SAFE     0
+ 469          #define STATE_PREWARN  1
+ 470          #define STATE_WARNING  2
+ 471          #define STATE_DANGER   3
+ 472          #define STATE_EMERGENCY 4
+ 473          
+ 474          volatile unsigned char screen_change = 0;
+ 475          volatile unsigned char screen_number = 0;
+ 476          volatile unsigned int timer_ticks = 0;
+ 477          
+ 478          /* 11.0592 MHz, 12 clock cycles per timer tick.
+ 479             Mode 1 preload DC00h gives nominal 10 ms. */
+ 480          void timer0_init(void)
+ 481          {
+ 482   1          TMOD = (TMOD & 0xF0) | 0x01;
+ 483   1          TH0 = 0xDC;
+ 484   1          TL0 = 0x00;
+ 485   1          ET0 = 1;
+ 486   1          EA = 1;
+ 487   1          TR0 = 1;
+ 488   1      }
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 9   
+
+ 489          
+ 490          void timer0_isr(void) interrupt 1
+ 491          {
+ 492   1          TH0 = 0xDC;
+ 493   1          TL0 = 0x00;
+ 494   1          timer_ticks++;
+ 495   1          if (timer_ticks >= 200)
+ 496   1          {
+ 497   2              timer_ticks = 0;
+ 498   2              screen_change = 1;
+ 499   2          }
+ 500   1      }
+ 501          
+ 502          unsigned char calculate_index(unsigned int temperature,
+ 503                                        unsigned char flame,
+ 504                                        unsigned char gas,
+ 505                                        unsigned char vibration,
+ 506                                        unsigned char emergency)
+ 507          {
+ 508   1          unsigned int risk = 0;
+ 509   1          if (emergency) return 0;
+ 510   1          if (temperature >= 50) risk += 30;
+ 511   1          else if (temperature >= 40) risk += 20;
+ 512   1          else if (temperature >= 30) risk += 10;
+ 513   1          if (flame) risk += 30;
+ 514   1          if (gas) risk += 25;
+ 515   1          if (vibration) risk += 15;
+ 516   1          if (risk >= 100) return 0;
+ 517   1          return (unsigned char)(100 - risk);
+ 518   1      }
+ 519          
+ 520          unsigned char classify_alarm(unsigned int temperature,
+ 521                                       unsigned char flame,
+ 522                                       unsigned char gas,
+ 523                                       unsigned char vibration,
+ 524                                       unsigned char emergency)
+ 525          {
+ 526   1          if (emergency) return STATE_EMERGENCY;
+ 527   1          if (temperature >= 50 || flame || gas) return STATE_DANGER;
+ 528   1          if (temperature >= 40 || vibration) return STATE_WARNING;
+ 529   1          if (temperature >= 30) return STATE_PREWARN;
+ 530   1          return STATE_SAFE;
+ 531   1      }
+ 532          
+ 533          void lcd_number3(unsigned char number)
+ 534          {
+ 535   1          lcd_data((number / 100) + '0');
+ 536   1          lcd_data(((number / 10) % 10) + '0');
+ 537   1          lcd_data((number % 10) + '0');
+ 538   1      }
+ 539          
+ 540          void display_index_status(unsigned char index, unsigned char state)
+ 541          {
+ 542   1          lcd_clear();
+ 543   1          lcd_goto(0, 0);
+ 544   1          lcd_string("SAFETY IDX: ");
+ 545   1          lcd_number3(index);
+ 546   1          lcd_goto(1, 0);
+ 547   1          if (state == STATE_EMERGENCY) lcd_string("EMERGENCY");
+ 548   1          else if (state == STATE_DANGER) lcd_string("STATUS: DANGER");
+ 549   1          else if (state == STATE_WARNING) lcd_string("STATUS: WARNING");
+ 550   1          else if (state == STATE_PREWARN) lcd_string("STATUS: PREWARN");
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 10  
+
+ 551   1          else lcd_string("STATUS: SAFE");
+ 552   1      }
+ 553          
+ 554          /* Keep the original hazard display functions and priority messages. */
+ 555          void display_sensor_details(unsigned int temperature,
+ 556                                      unsigned char alarm_count)
+ 557          {
+ 558   1          if (EMERGENCY == 0) display_emergency_alert();
+ 559   1          else if (temperature >= 50) display_critical_temperature(temperature);
+ 560   1          else if (alarm_count >= 2) display_multiple_sensors();
+ 561   1          else if (FLAME == 0) display_flame_alert();
+ 562   1          else if (GAS == 0) display_gas_alert();
+ 563   1          else if (VIBRATION == 0) display_vibration_alert();
+ 564   1          else if (temperature >= 40)
+ 565   1          {
+ 566   2              lcd_clear();
+ 567   2              lcd_goto(0, 0);
+ 568   2              lcd_string("TEMP WARNING");
+ 569   2              lcd_goto(1, 0);
+ 570   2              display_temperature(temperature);
+ 571   2          }
+ 572   1          else if (temperature >= 30)
+ 573   1          {
+ 574   2              lcd_clear();
+ 575   2              lcd_goto(0, 0);
+ 576   2              lcd_string("TEMP PRE-WARN");
+ 577   2              lcd_goto(1, 0);
+ 578   2              display_temperature(temperature);
+ 579   2          }
+ 580   1          else
+ 581   1          {
+ 582   2              lcd_clear();
+ 583   2              lcd_goto(0, 0);
+ 584   2              lcd_string("SYSTEM NORMAL");
+ 585   2              lcd_goto(1, 0);
+ 586   2              display_temperature(temperature);
+ 587   2          }
+ 588   1      }
+ 589          
+ 590          /* =========================================================
+ 591             MAIN PROGRAM (existing pin assignments and LCD/ADC retained)
+ 592             ========================================================= */
+ 593          void main(void)
+ 594          {
+ 595   1          unsigned int temperature;
+ 596   1          unsigned char alarm_count;
+ 597   1          unsigned char flame_active, gas_active, vibration_active;
+ 598   1          unsigned char emergency_active, safety_index, alarm_state;
+ 599   1          unsigned char previous_state = 255;
+ 600   1          unsigned char previous_screen = 255;
+ 601   1          unsigned char previous_index = 255;
+ 602   1          unsigned int previous_temperature = 65535;
+ 603   1          unsigned char previous_count = 255;
+ 604   1          unsigned char previous_flags = 255;
+ 605   1          unsigned char flags;
+ 606   1          unsigned char refresh;
+ 607   1      
+ 608   1          /* Original initial port states */
+ 609   1          P0 = 0xFF;
+ 610   1          P1 = 0x0F;
+ 611   1          P2 = 0x00;
+ 612   1          P3 = 0xFF;
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 11  
+
+ 613   1      
+ 614   1          lcd_init();
+ 615   1          lcd_clear();
+ 616   1          lcd_goto(0,0);
+ 617   1          lcd_string("INDUSTRIAL SAFE");
+ 618   1          lcd_goto(1,0);
+ 619   1          lcd_string("SYSTEM STARTING");
+ 620   1          delay_ms(2000);
+ 621   1          lcd_clear();
+ 622   1          timer0_init();
+ 623   1      
+ 624   1          while (1)
+ 625   1          {
+ 626   2              temperature = get_temperature();
+ 627   2              flame_active = (FLAME == 0);
+ 628   2              gas_active = (GAS == 0);
+ 629   2              vibration_active = (VIBRATION == 0);
+ 630   2              emergency_active = (EMERGENCY == 0);
+ 631   2      
+ 632   2              alarm_count = flame_active + gas_active +
+ 633   2                            vibration_active + emergency_active;
+ 634   2              flags = flame_active | (gas_active << 1) |
+ 635   2                      (vibration_active << 2) | (emergency_active << 3);
+ 636   2      
+ 637   2              safety_index = calculate_index(temperature, flame_active,
+ 638   2                               gas_active, vibration_active, emergency_active);
+ 639   2              alarm_state = classify_alarm(temperature, flame_active,
+ 640   2                               gas_active, vibration_active, emergency_active);
+ 641   2      
+ 642   2              /* Original indicator functions; pre-warning uses warning LEDs. */
+ 643   2              if (alarm_state == STATE_DANGER || alarm_state == STATE_EMERGENCY)
+ 644   2                  alarm_condition();
+ 645   2              else if (alarm_state == STATE_WARNING || alarm_state == STATE_PREWARN)
+ 646   2                  warning_condition();
+ 647   2              else
+ 648   2                  normal_condition();
+ 649   2      
+ 650   2              /* Timer interrupt only requests a screen change. */
+ 651   2              refresh = 0;
+ 652   2              if (screen_change)
+ 653   2              {
+ 654   3                  EA = 0;
+ 655   3                  screen_change = 0;
+ 656   3                  EA = 1;
+ 657   3                  screen_number = !screen_number;
+ 658   3                  refresh = 1;
+ 659   3              }
+ 660   2      
+ 661   2              /* A newly detected danger overrides the normal screen rotation. */
+ 662   2              if ((alarm_state >= STATE_DANGER) &&
+ 663   2                  ((previous_state < STATE_DANGER) || (flags != previous_flags)))
+ 664   2              {
+ 665   3                  screen_number = 1;
+ 666   3                  refresh = 1;
+ 667   3                  EA = 0;
+ 668   3                  timer_ticks = 0;
+ 669   3                  screen_change = 0;
+ 670   3                  EA = 1;
+ 671   3              }
+ 672   2      
+ 673   2              if (screen_number != previous_screen ||
+ 674   2                  alarm_state != previous_state ||
+C51 COMPILER V9.60.7.0   ALARM_SYSTEM                                                      10/19/2026 17:47:32 PAGE 12  
+
+ 675   2                  safety_index != previous_index ||
+ 676   2                  (screen_number == 1 &&
+ 677   2                   (temperature != previous_temperature ||
+ 678   2                    alarm_count != previous_count || flags != previous_flags)))
+ 679   2                  refresh = 1;
+ 680   2      
+ 681   2              if (refresh)
+ 682   2              {
+ 683   3                  if (screen_number == 0)
+ 684   3                      display_index_status(safety_index, alarm_state);
+ 685   3                  else
+ 686   3                      display_sensor_details(temperature, alarm_count);
+ 687   3              }
+ 688   2      
+ 689   2              previous_screen = screen_number;
+ 690   2              previous_state = alarm_state;
+ 691   2              previous_index = safety_index;
+ 692   2              previous_temperature = temperature;
+ 693   2              previous_count = alarm_count;
+ 694   2              previous_flags = flags;
+ 695   2              /* No 800 ms blocking delay: sensors are polled repeatedly. */
+ 696   2          }
+ 697   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1551    ----
+   CONSTANT SIZE    =    308    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4      40
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
