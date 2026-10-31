@@ -53,7 +53,7 @@ The pin assignments below are taken from the firmware and should match the Prote
 
 **Input logic:** the four digital safety inputs are **active low** (`0` = detected/pressed, `1` = inactive). Output polarity follows the existing circuit and firmware; check your Proteus LED and buzzer wiring.
 <img width="1231" height="587" alt="image" src="https://github.com/user-attachments/assets/c03c5f13-5d3e-4e68-b947-0c61455dc273" />
-<img width="1105" height="1280" alt="WhatsApp Image 2026-10-31 at 4 44 34 AM (1)" src="https://github.com/user-attachments/assets/f40427e9-c800-4fb3-9197-ed72c3d2cdc2" />
+<img width="1280" height="960" alt="WhatsApp Image 2026-10-31 at 10 37 15 AM" src="https://github.com/user-attachments/assets/b2f7da78-1c27-4cc8-a6ef-825e577e4d84" />
 
 
 ## Safety Index calculation
@@ -108,6 +108,11 @@ STATUS: PREWARN
 TEMP PRE-WARN
 TEMP: 35 C
 ```
+
+**View 3 — Emergency Condition**
+
+<img width="1080" height="1440" alt="WhatsApp Image 2026-10-31 at 5 13 43 AM" src="https://github.com/user-attachments/assets/84ff2e2c-fcc9-4160-8762-9b0285d06f15" />
+
 
 Timer 0 is configured in 16-bit Mode 1 for an approximately 10 ms interrupt at **11.0592 MHz** (`TH0 = 0xDC`, `TL0 = 0x00`). After 200 interrupts, the interrupt service routine sets a flag. The **main loop** handles the LCD change; LCD operations are not performed inside the ISR. Actual timing is approximate due to interrupt/reload overhead.
 
