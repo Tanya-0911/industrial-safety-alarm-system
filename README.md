@@ -53,6 +53,7 @@ The pin assignments below are taken from the firmware and should match the Prote
 
 **Input logic:** the four digital safety inputs are **active low** (`0` = detected/pressed, `1` = inactive). Output polarity follows the existing circuit and firmware; check your Proteus LED and buzzer wiring.
 <img width="1231" height="587" alt="image" src="https://github.com/user-attachments/assets/c03c5f13-5d3e-4e68-b947-0c61455dc273" />
+<img width="1105" height="1280" alt="WhatsApp Image 2026-10-31 at 4 44 34 AM (1)" src="https://github.com/user-attachments/assets/f40427e9-c800-4fb3-9197-ed72c3d2cdc2" />
 
 
 ## Safety Index calculation
